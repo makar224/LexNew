@@ -16,12 +16,12 @@ public:
 	void setTranslations(QVector<TranslationItem*>* vtip) {
 		mTrItemsVPtr = vtip;
 	}
-	int sessionInterval() {return nSessionMinutes;}
+	int sessionInterval() {return nSessionInterval;}
 	int successesForExclusion() {return nSuccessesForExclusion;}
 	int alternativesNumber() {return nAlternatives;}
 	int triesNumber() {return nTries;}
 
-	void setSessionMinutes(int num) { nSessionMinutes = num;}
+	void setSessionInterval(int num) { nSessionInterval = num;}
 	void setSuccessesForExclusion(int num);
 	void setAlternativesNumber(int num) { nAlternatives = num; }
 	void setTriesNumber(int num) { nTries = num; }
@@ -48,7 +48,7 @@ private:
 	int mComboboxCorrectAlternativeIndex;
 	TranslationItem *mRequestTrItem;
 
-	int nSessionMinutes;
+	int nSessionInterval;
 	int nAlternatives;
 	int nSuccessesForExclusion;
 	int nTries;

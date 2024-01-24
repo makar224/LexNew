@@ -12,7 +12,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>*
 	QWidget(parent),
 	mTrItemsVPtr(tivp),
 	mRequestTrItem(nullptr),
-	nSessionMinutes(5),
+	nSessionInterval(5),
 	nAlternatives(5),
 	nSuccessesForExclusion(3),
 	nTries(4),

@@ -107,6 +107,7 @@ bool MainWindow::event(QEvent *e) {
 		}
 	}
 	else if (e->type() == QEvent::Show) {
+		restoreTranslationSettings();
 		//if (sessionStartTimer->isActive())
 		sessionStartTimer->stop();
 	}
@@ -210,12 +211,17 @@ void MainWindow::restoreDefaultTranslationSettings() {
 	applyTranslationSettings();
 }
 void MainWindow::applyTranslationSettings() {
-	sessionDialog->setSessionMinutes(ui->sessionIntervalSpinBox->value());
+	sessionDialog->setSessionInterval(ui->sessionIntervalSpinBox->value());
 	sessionDialog->setSuccessesForExclusion(ui->successTriesSpinBox->value());
 	sessionDialog->setAlternativesNumber(ui->alternativesSpinBox->value());
 	sessionDialog->setTriesNumber(ui->triesSpinBox->value());
 }
-
+void MainWindow::restoreTranslationSettings() {
+	ui->sessionIntervalSpinBox->setValue(sessionDialog->sessionInterval());
+	ui->successTriesSpinBox->setValue(sessionDialog->successesForExclusion());
+	ui->alternativesSpinBox->setValue(sessionDialog->alternativesNumber());
+	ui->triesSpinBox->setValue(sessionDialog->triesNumber());
+}
 void MainWindow::addTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
 	trItemsv.append(const_cast<TranslationItem *>(tip));

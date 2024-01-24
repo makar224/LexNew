@@ -29,6 +29,8 @@ public:
 protected slots:
 	void applyTranslationSettings();
 	void restoreDefaultTranslationSettings();
+	void restoreTranslationSettings();
+
 	void startTranslationDialog();
 
 	void addTranslation(const TranslationItem *tip);
