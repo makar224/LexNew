@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
 bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
 		if (!sessionDialog->isVisible()) {
-			if (sessionDialog->checkReady())
+			if (sessionDialog->prepareTranslationRequest())
 				//sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 				sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
 		}
@@ -118,7 +118,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 		if (event->type()==QEvent::Close /*|| event->type()==QEvent::Hide*/) {
 			if(!isVisible()) {
 				//Q_ASSERT(!sessionStartTimer->isActive());
-				if (sessionDialog->checkReady())
+				if (sessionDialog->prepareTranslationRequest())
 					//sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 					sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
 			}
@@ -145,7 +145,7 @@ void MainWindow::startTranslationDialog()
 	else if (qobject_cast<QPushButton*>(QObject::sender()) == ui->startSessionButton)
 	{
 		// вызов по кнопке
-		if (sessionDialog->checkReady())
+		if (sessionDialog->prepareTranslationRequest())
 			sessionDialog->showNormal();
 	}
 

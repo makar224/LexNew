@@ -62,27 +62,23 @@ TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>*
 	connect(alternativesBox, SIGNAL(activated(int)),
 			this, SLOT(alternativeChoosen(int)));
 	connect(okButton, &QPushButton::clicked,
-			this, &TranslationDialog::nextTranslationRequest);
+			this, &TranslationDialog::requestAfterWrongAlternativeChoosen);
 }
 
 /*void TranslationDialog::open() {
 	if (prepareTranslationRequest())
 		QDialog::open();
 }*/
-void TranslationDialog::showEvent(QShowEvent *e) {
-	prepareTranslationRequest();
-
-	QWidget::showEvent(e);
-}
-void TranslationDialog::closeEvent(QCloseEvent *e) {
+/*void TranslationDialog::closeEvent(QCloseEvent *e) {
 	mRequestTrItem = nullptr;
 	nTriesCounter = 0;
 	mComboboxCorrectAlternativeIndex = -1;
 	//QDialog::closeEvent(e);
 	QWidget::closeEvent(e);
-}
-void TranslationDialog::nextTranslationRequest() {
+}*/
+void TranslationDialog::requestAfterWrongAlternativeChoosen() {
 	if (nTriesCounter >= nTries) {
+		nTriesCounter = 0;
 		close();
 		return;
 	}
@@ -99,12 +95,13 @@ void TranslationDialog::alternativeChoosen(int index) {
 		}
 		if (nTriesCounter >= nTries)
 		{
+			nTriesCounter = 0;
 			close();
 			return;
 		}
 		if (! prepareTranslationRequest())
 		{
-			close();
+			hide();
 			return;
 		}
 	}
@@ -122,7 +119,7 @@ void TranslationDialog::setSuccessesForExclusion(int num) {
 	}
 	nSuccessesForExclusion = num;
 }
-bool TranslationDialog::checkReady() {
+/*bool TranslationDialog::checkReady() {
 	Q_ASSERT(nullptr != mTrItemsVPtr);
 	if (nullptr == mTrItemsVPtr) {
 		QMessageBox::critical(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
@@ -143,13 +140,13 @@ bool TranslationDialog::checkReady() {
 	}
 
 	return true;
-}
+}*/
 bool TranslationDialog::prepareTranslationRequest()
 {
 	Q_ASSERT(nullptr != mTrItemsVPtr);
 	if (nullptr == mTrItemsVPtr) {
 		//if (verbal)
-		//	QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
+		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
 		return false;
 	}
 
@@ -163,7 +160,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	if (workTrItemsv.count() < 2)
 	{
 		//if (verbal)
-		//	QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно переводов для формирования диалога."));
+		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно переводов для формирования диалога."));
 		return false;
 	}
 	// формируем запрашиваемый перевод
@@ -188,7 +185,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	answerAlternatives.removeDuplicates();
 	if (answerAlternatives.count() < 1) {
 		//if (verbal)
-		//	QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно альтернатив перевода."));
+		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно альтернатив перевода."));
 		return false;
 	}
 	//

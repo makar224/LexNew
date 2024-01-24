@@ -26,22 +26,19 @@ public:
 	void setAlternativesNumber(int num) { nAlternatives = num; }
 	void setTriesNumber(int num) { nTries = num; }
 
-	bool checkReady();
+	bool prepareTranslationRequest();
 
 public slots:
 	//void open() override;
 protected slots:
 	void alternativeChoosen(int index);
-private slots:
-	bool prepareTranslationRequest();
+	void requestAfterWrongAlternativeChoosen();
 signals:
 	void excludeTranslation(TranslationItem *tip);
 protected:
-	void showEvent(QShowEvent *event) override;
-	void closeEvent(QCloseEvent *) override;
-private:
-	void nextTranslationRequest();
+	//void closeEvent(QCloseEvent *) override;
 
+private:
 	QLabel *requestLabel;
 	QComboBox *alternativesBox;
 	QPushButton *closeButton;
