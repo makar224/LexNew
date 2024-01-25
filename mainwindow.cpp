@@ -1,15 +1,10 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "ui_movetranslations.h"
-//#include "translationmodel.h"
-#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-	//, ui1(new Ui::MoveTranslationsWidget)
-	//, moveTranslationsWidget(parent)
 {
 	trItemsv.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
 	trItemsv.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
@@ -19,35 +14,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->setupUi(this);
 
-	// Загрузка сохраненных настроек приложения и положения окна из settings-файла
-
-
-	/*ui1->setupUi(&moveTranslationsWidget);
-
-	connect(ui->moveTranslationsButton, &QPushButton::clicked,
-			&moveTranslationsWidget, &QWidget::show);
-
-	TranslationModel *model = new TranslationModel();
-	ui1->currentTableView->setModel(model);
-	for (int column = 0; column < model->columnCount(); ++column)
-		ui1->currentTableView->resizeColumnToContents(column);
-	//ui1->exclusionTableView->setModel(model);*/
-
 	dialog1 = new MoveTranslationsDialog;
 	connect(ui->moveTranslationsButton, &QPushButton::clicked,
 			dialog1, &QDialog::open);
 
-	/*connect(this, &MainWindow::dictionaryAddTranslation,
-			dialog1, &MoveTranslationsDialog::addTranslation);
-	connect(this, &MainWindow::dictionaryRemoveTranslation,
-			dialog1, &MoveTranslationsDialog::removeTranslation);
-	connect(this, &MainWindow::dictionaryEditTranslation,
-			dialog1, &MoveTranslationsDialog::editTranslation);*/
 	dialog1->setupTables(trItemsv);
 
 	dialog2 = new DictionaryEditDialog;
-	//connect(ui->dictionaryEditButton, &QPushButton::clicked,
-	//		dialog2, &QDialog::open);
 	connect(dialog2, SIGNAL(addTranslationSig(const TranslationItem *)),
 			this, SLOT(addTranslation(const TranslationItem *)));
 	connect(dialog2, SIGNAL(removeTranslationSig(const TranslationItem *)),
@@ -61,12 +34,11 @@ MainWindow::MainWindow(QWidget *parent)
 	sessionDialog = new TranslationDialog(nullptr, &trItemsv);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			dialog1, &MoveTranslationsDialog::excludeTranslation);
-	//connect(dialog3, SIGNAL(finished(int)),
-	//		this, SLOT(translationDialogFinished(int)));
 
-	// Устанавливаем диалоге переводов исходные значения с контролов
+	// Устанавливаем в диалоге переводов исходные значения с контролов
 	// ... загрузить установки из QSettings ...
 	restoreDefaultTranslationSettings(); // временно так
+
 	// ...
 
 	connect(ui->applyButton, &QPushButton::clicked,
@@ -77,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->closeButton, &QPushButton::clicked,
 			this, &QMainWindow::close);
 
-	//dialog3->setModal(false);
-	//dialog3->setWindowModality(Qt::ApplicationModal);
 	sessionDialog->installEventFilter(this);
 	connect(ui->startSessionButton, &QPushButton::clicked,
 				this, &MainWindow::startTranslationDialog);
@@ -97,7 +67,6 @@ bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
 		if (!sessionDialog->isVisible()) {
 			if (sessionDialog->prepareTranslationRequest())
-				//sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 				sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
 		}
 		if (trayIcon->isVisible()) {
@@ -108,7 +77,6 @@ bool MainWindow::event(QEvent *e) {
 	}
 	else if (e->type() == QEvent::Show) {
 		restoreTranslationSettings();
-		//if (sessionStartTimer->isActive())
 		sessionStartTimer->stop();
 	}
 
@@ -118,9 +86,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 	if (obj == sessionDialog) {
 		if (event->type()==QEvent::Close /*|| event->type()==QEvent::Hide*/) {
 			if(!isVisible()) {
-				//Q_ASSERT(!sessionStartTimer->isActive());
 				if (sessionDialog->prepareTranslationRequest())
-					//sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 					sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
 			}
 		}
@@ -138,7 +104,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 // вызов диалога переводов
 void MainWindow::startTranslationDialog()
 {
-	//QTimer *timer= qobject_cast<QTimer*>(QObject::sender());
 	if (qobject_cast<QTimer*>(QObject::sender()) == sessionStartTimer) {
 		sessionDialog->showNormal();
 		return;
@@ -185,12 +150,6 @@ void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
 		if (!sessionDialog->isVisible())
 			showNormal();
 		break;
-	/*case QSystemTrayIcon::DoubleClick:
-		iconComboBox->setCurrentIndex((iconComboBox->currentIndex() + 1) % iconComboBox->count());
-		break;
-	case QSystemTrayIcon::MiddleClick:
-		showMessage();
-		break;*/
 	default:
 		;
 	}
@@ -230,7 +189,6 @@ void MainWindow::addTranslation(const TranslationItem *tip) {
 }
 void MainWindow::removeTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
-	//emit dictionaryRemoveTranslation(tip);
 	dialog1->removeTranslation(tip);
 	trItemsv.removeOne(const_cast<TranslationItem*>(tip));
 	delete tip;
@@ -238,13 +196,11 @@ void MainWindow::removeTranslation(const TranslationItem *tip) {
 void MainWindow::editTranslation(const TranslationItem *tip) {
 	// у tip должен быть уже изменен текст
 	Q_ASSERT(nullptr != tip);
-	//emit dictionaryEditTranslation(tip);
 	dialog1->editTranslation(tip);
 }
 MainWindow::~MainWindow()
 {
     delete ui;
-	//delete ui1;
 	delete dialog1;
 	delete dialog2;
 	delete sessionDialog;

@@ -16,18 +16,13 @@ class MoveTranslationsDialog: public QDialog
 public:
 	explicit MoveTranslationsDialog(QWidget *parent=nullptr);
 	~MoveTranslationsDialog();
-	//void done(int result);
 	void setupTables(const QVector<TranslationItem*> &v);
 public slots:
 	void addTranslation(const TranslationItem *tip);
 	void removeTranslation(const TranslationItem *tip);
 	void editTranslation(const TranslationItem *tip);
-	//void updateTables(const TranslationItem *tip);
 	void excludeTranslation(TranslationItem *tip);
 protected slots:
-	//void currentTableCurrentCellChanged(int,int,int,int);
-	//void currentTableItemSelectionChanged();
-
 	void tableItemSelectionChanged();
 	void changeDirection();
 	void moveTranslation();
@@ -40,8 +35,6 @@ private:
 
 	QTableWidget *currentTableWidget;
 	QTableWidget *exclusionTableWidget;
-	//QLabel *currentTableLabel;
-	//QLabel *exclusionTableLabel;
 	QPushButton *moveButton;
 	QPushButton *changeDirButton;
 	//QPushButton *restoreAllButton;

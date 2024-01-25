@@ -31,9 +31,7 @@ HEADERS += \
     translationmodel.h
 
 FORMS += \
-    dictionaryedit.ui \
-    mainwindow.ui \
-    movetranslations.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 #qnx: target.path = /tmp/$${TARGET}/bin

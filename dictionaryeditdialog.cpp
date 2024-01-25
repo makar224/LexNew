@@ -26,7 +26,6 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	QHBoxLayout *hboxlayout1 = new QHBoxLayout;
 	hboxlayout1->addWidget(expr1Edit);
 	hboxlayout1->addWidget(expr2Edit);
-	//QHBoxLayout *hboxlayout2 = new QHBoxLayout;
 	//hboxlayout2->addStretch();
 	hboxlayout1->addWidget(addButton);
 	hboxlayout1->addWidget(removeButton);
@@ -35,7 +34,6 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	hboxlayout3->addWidget(closeButton);
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->addLayout(hboxlayout1);
-	//layout->addLayout(hboxlayout2);
 	layout->addWidget(tableWidget);
 	layout->addLayout(hboxlayout3);
 	setLayout(layout);
@@ -57,8 +55,6 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 			this, &QDialog::accept);
 	connect(addButton, &QPushButton::clicked,
 			this, &DictionaryEditDialog::addTranslation);
-	//connect(addButton, &QPushButton::clicked,
-	//		this, SLOT(addTranslation));
 	//connect(expr1Edit, &QLineEdit::returnPressed,
 	//		this, SLOT(addTranslation));
 	connect(removeButton, &QPushButton::clicked,
@@ -72,12 +68,6 @@ bool DictionaryEditDialog::eventFilter(QObject *obj, QEvent *event) {
 					|| keyEvent->key()==Qt::Key_Backspace)
 			{
 				//qDebug("Ate key press %d", keyEvent->key());
-				/*QList<QTableWidgetItem*> sldItems = tableWidget->selectedItems();
-				if (!sldItems.isEmpty()) {
-					int sldRow = (*sldItems.first()).row();
-					tableWidget->removeRow(sldRow);
-					return true;
-				}*/
 				removeTranslation();
 				return true;
 			}
@@ -183,6 +173,6 @@ bool DictionaryEditDialog::setupTableItemRow(int row, const TranslationItem *tip
 TranslationItem *DictionaryEditDialog::getRowTIFromData(int row) const {
 	QVariant rowVarData = tableWidget->item(row, 0)->data(Qt::UserRole);
 	TranslationItem *rowtip = (TranslationItem*)rowVarData.toULongLong();
-	//Q_ASSERT(nullptr != rowtip);
+	//Q_ASSERT(nullptr != rowtip); // если условие не сохранилось - это не редактирование, а первое заполнение полей в setupTable
 	return rowtip;
 }

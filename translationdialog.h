@@ -28,8 +28,6 @@ public:
 
 	bool prepareTranslationRequest();
 
-public slots:
-	//void open() override;
 protected slots:
 	void alternativeChoosen(int index);
 	void requestAfterWrongAlternativeChoosen();
@@ -45,7 +43,7 @@ private:
 	QPushButton *okButton;
 	QVector<TranslationItem*>* mTrItemsVPtr;
 
-	int mComboboxCorrectAlternativeIndex;
+	int mComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
 	TranslationItem *mRequestTrItem;
 
 	int nSessionInterval;

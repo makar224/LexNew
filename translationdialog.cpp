@@ -32,16 +32,6 @@ TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>*
 	okButton->setMaximumWidth(40);
 	closeButton->setText(tr("Закрыть"));
 	closeButton->setMaximumWidth(80);
-	/*QVBoxLayout *vlayout1 = new QVBoxLayout;
-	vlayout1->addWidget(requestLabel);
-	vlayout1->addWidget(alternativesBox);
-	QVBoxLayout *vlayout2 = new QVBoxLayout;
-	vlayout2->addWidget(okButton);
-	vlayout2->addWidget(closeButton);
-	QHBoxLayout *hlayout = new QHBoxLayout;
-	hlayout->addLayout(vlayout1);
-	hlayout->addLayout(vlayout2);
-	setLayout(hlayout);*/
 	QVBoxLayout *vlayout = new QVBoxLayout;
 	vlayout->setSpacing(10);
 	vlayout->addWidget(requestLabel);
@@ -64,11 +54,6 @@ TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>*
 	connect(okButton, &QPushButton::clicked,
 			this, &TranslationDialog::requestAfterWrongAlternativeChoosen);
 }
-
-/*void TranslationDialog::open() {
-	if (prepareTranslationRequest())
-		QDialog::open();
-}*/
 /*void TranslationDialog::closeEvent(QCloseEvent *e) {
 	mRequestTrItem = nullptr;
 	nTriesCounter = 0;
@@ -119,38 +104,15 @@ void TranslationDialog::setSuccessesForExclusion(int num) {
 	}
 	nSuccessesForExclusion = num;
 }
-/*bool TranslationDialog::checkReady() {
-	Q_ASSERT(nullptr != mTrItemsVPtr);
-	if (nullptr == mTrItemsVPtr) {
-		QMessageBox::critical(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
-		return false;
-	}
-	// формируем список возможных ответов (с правильным ответом)
-	QStringList answerAlternatives; QString altText="";
-	for (const TranslationItem *tip: *mTrItemsVPtr) {
-		if (!tip->isExcluded()) {
-			answerAlternatives << (tip->isInvert()?tip->firstExpr():tip->secondExpr());
-		}
-	}
-	answerAlternatives.removeDuplicates();
-	if (answerAlternatives.count()-1 < 1) {// альтернатив без правильной должно быть >= 1
-	// недостаточно альтернатив перевода
-		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно альтернатив перевода."));
-		return false;
-	}
-
-	return true;
-}*/
+// Подготавливаем диалог к выдаче запроса перевода
 bool TranslationDialog::prepareTranslationRequest()
 {
 	Q_ASSERT(nullptr != mTrItemsVPtr);
 	if (nullptr == mTrItemsVPtr) {
-		//if (verbal)
 		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
 		return false;
 	}
 
-	// Подготавливаем диалог к выдаче запроса переводам
 	// отбираем неисключенные переводы в отдельный массив
 	QVector<TranslationItem *> workTrItemsv;
 	for (const TranslationItem * tip: *mTrItemsVPtr) {
@@ -159,7 +121,6 @@ bool TranslationDialog::prepareTranslationRequest()
 	}
 	if (workTrItemsv.count() < 2)
 	{
-		//if (verbal)
 		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно переводов для формирования диалога."));
 		return false;
 	}
@@ -173,7 +134,6 @@ bool TranslationDialog::prepareTranslationRequest()
 	// Заполняем combo box альтернативами прав перевода выражения
 	if (alternativesBox->count() >0)
 		alternativesBox->clear();
-	//alternativesBox->insertItem(0, "lasdfkj"); // в combobox не видно изначально ниодного возможного перевода
 	QString altText="";
 	// формируем список возможных ответов без правильного ответа
 	QStringList answerAlternatives;
@@ -184,16 +144,11 @@ bool TranslationDialog::prepareTranslationRequest()
 	}
 	answerAlternatives.removeDuplicates();
 	if (answerAlternatives.count() < 1) {
-		//if (verbal)
 		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно альтернатив перевода."));
 		return false;
 	}
-	//
-	// индекс правильного ответа в combobox
-	//indexOfCorrectInCombobox = 1 + rand() % std::min(nAlternatives,answerAlternatives.count()+1);
-	mComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
 
-	//int ind = 1;
+	mComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
 	int ind = 0;
 	while ( (ind <nAlternatives && !answerAlternatives.isEmpty())
 		   || (ind==mComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {

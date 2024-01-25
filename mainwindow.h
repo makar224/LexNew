@@ -6,13 +6,11 @@
 #include <QSystemTrayIcon>
 #include "movetranslationsdialog.h"
 #include "dictionaryeditdialog.h"
-//#include "ui_movetranslations.h"
 #include "translationmodel.h"
 #include "translationdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow;
-			 //class MoveTranslationsWidget;
 }
 QT_END_NAMESPACE
 
@@ -42,7 +40,6 @@ signals:
 	void dictionaryRemoveTranslation(const TranslationItem*);
 	void dictionaryEditTranslation(const TranslationItem*);
 protected:
-	//void closeEvent(QCloseEvent *) override;
 	bool event(QEvent *event) override;
 	bool eventFilter(QObject *, QEvent *) override;
 private slots:
@@ -51,8 +48,6 @@ private:
 	void createActions();
 	void createTrayIcon();
     Ui::MainWindow *ui;
-	//Ui::MoveTranslationsWidget *ui1;
-	//QWidget moveTranslationsWidget;
 	MoveTranslationsDialog *dialog1;
 	DictionaryEditDialog *dialog2;
 	TranslationDialog *sessionDialog;
