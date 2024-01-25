@@ -8,7 +8,6 @@
 #include <QShowEvent>
 
 TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>* tivp) :
-	//QDialog(parent),
 	QWidget(parent),
 	mTrItemsVPtr(tivp),
 	mRequestTrItem(nullptr),
@@ -71,7 +70,7 @@ void TranslationDialog::requestAfterWrongAlternativeChoosen() {
 }
 void TranslationDialog::alternativeChoosen(int index) {
 	++ nTriesCounter;
-	if (index == mComboboxCorrectAlternativeIndex)
+	if (index == mnComboboxCorrectAlternativeIndex)
 	{ // правильный выбор перевода в combo box
 		Q_ASSERT(nullptr != mRequestTrItem);
 		mRequestTrItem->incrSuccessCounter();
@@ -91,7 +90,7 @@ void TranslationDialog::alternativeChoosen(int index) {
 		}
 	}
 	else {
-		alternativesBox->setCurrentIndex(mComboboxCorrectAlternativeIndex);
+		alternativesBox->setCurrentIndex(mnComboboxCorrectAlternativeIndex);
 		//alternativesBox->setCurrentIndex(-1);
 		alternativesBox->setEnabled(false);
 		okButton->setEnabled(true);
@@ -148,11 +147,11 @@ bool TranslationDialog::prepareTranslationRequest()
 		return false;
 	}
 
-	mComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
+	mnComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
 	int ind = 0;
 	while ( (ind <nAlternatives && !answerAlternatives.isEmpty())
-		   || (ind==mComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {
-		if (ind == mComboboxCorrectAlternativeIndex) {
+		   || (ind==mnComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {
+		if (ind == mnComboboxCorrectAlternativeIndex) {
 			altText = correctAnswer;
 		}
 		else {

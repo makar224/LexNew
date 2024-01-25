@@ -43,7 +43,7 @@ private:
 	QPushButton *okButton;
 	QVector<TranslationItem*>* mTrItemsVPtr;
 
-	int mComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
+	int mnComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
 	TranslationItem *mRequestTrItem;
 
 	int nSessionInterval;

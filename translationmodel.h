@@ -8,7 +8,7 @@ class TranslationItem {
 public:
 	//TranslationItem():invert(false), excluded(false) {}
 	TranslationItem(const QString &expr1, const QString &expr2, bool excl=false, bool inv=false);
-	int successCounter() {return _successCounter;}
+	int successCounter() {return nSuccessCounter;}
 	void setInvert(bool b) {invert = b;}
 	void setExcluded(bool b) {excluded = b;}
 	bool isInvert() const {return invert;}
@@ -21,14 +21,14 @@ public:
 	}
 	QString firstExpr() const {return exprs.first;}
 	QString secondExpr() const {return exprs.second;}
-	void incrSuccessCounter() {++_successCounter;}
-	void resetSuccessCounter() {_successCounter=0;}
+	void incrSuccessCounter() {++nSuccessCounter;}
+	void resetSuccessCounter() {nSuccessCounter=0;}
 
 private:
 	QPair<QString, QString> exprs;
 	bool invert;
 	bool excluded;
-	int _successCounter;
+	int nSuccessCounter;
 };
 
 //Q_DECLARE_METATYPE(TranslationItem*)

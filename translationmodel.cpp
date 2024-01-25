@@ -4,5 +4,5 @@ TranslationItem::TranslationItem(const QString &expr1, const QString &expr2, boo
 exprs(QPair<QString, QString>(expr1, expr2)),
 invert(inv),
 excluded(excl),
-_successCounter(0)
+nSuccessCounter(0)
 {}

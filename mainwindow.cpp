@@ -91,9 +91,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			}
 		}
 		else if (event->type() == QEvent::Show)
-		{ // диалог может быть открыт по кнопке или по таймеру. Если по кнопке то таймер дб уже остановлен,
+		{
+			sessionStartTimer->stop(); // -не обязательно: диалог может быть открыт по кнопке или по таймеру. Если по кнопке то таймер дб уже остановлен,
 			// если по таймеру, то тоже остановлен - время истекло
-			sessionStartTimer->stop();
 			hide();
 		}
 	}
@@ -184,7 +184,6 @@ void MainWindow::restoreTranslationSettings() {
 void MainWindow::addTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
 	trItemsv.append(const_cast<TranslationItem *>(tip));
-	//emit dictionaryAddTranslation(tip);
 	dialog1->addTranslation(tip);
 }
 void MainWindow::removeTranslation(const TranslationItem *tip) {
