@@ -26,6 +26,7 @@ protected slots:
 	void tableItemSelectionChanged();
 	void changeDirection();
 	void moveTranslation();
+	void restoreAllTranslations();
 
 private:
 	void setTableItemRow(QTableWidget *widg, int row, const TranslationItem *tip);
@@ -37,7 +38,7 @@ private:
 	QTableWidget *exclusionTableWidget;
 	QPushButton *moveButton;
 	QPushButton *changeDirButton;
-	//QPushButton *restoreAllButton;
+	QPushButton *restoreAllButton;
 	QPushButton *closeButton;
 };
 

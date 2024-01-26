@@ -1,4 +1,6 @@
-﻿#include "mainwindow.h"
+﻿#include <QGuiApplication>
+#include <QScreen>
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 
@@ -62,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
 	createTrayIcon();
 	connect(trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::trayIconActivated);
 	trayIcon->show();
+	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
+	setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
 }
 bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
