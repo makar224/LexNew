@@ -11,10 +11,10 @@ class TranslationDialog : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit TranslationDialog(QWidget *parent = nullptr, QVector<TranslationItem*>* tivp=nullptr);
+	explicit TranslationDialog(QWidget *parent = nullptr, QList<TranslationItem*>* tilp=nullptr);
 	~TranslationDialog() {}
-	void setTranslations(QVector<TranslationItem*>* vtip) {
-		mTrItemsVPtr = vtip;
+	void setTranslations(QList<TranslationItem*>* tipL) {
+		mTrItemsLPtr = tipL;
 	}
 	int sessionInterval() {return nSessionInterval;}
 	int successesForExclusion() {return nSuccessesForExclusion;}
@@ -41,7 +41,7 @@ private:
 	QComboBox *alternativesBox;
 	QPushButton *closeButton;
 	QPushButton *okButton;
-	QVector<TranslationItem*>* mTrItemsVPtr;
+	QList<TranslationItem*>* mTrItemsLPtr;
 
 	int mnComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
 	TranslationItem *mRequestTrItem;

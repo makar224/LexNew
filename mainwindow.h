@@ -51,7 +51,7 @@ private:
 	MoveTranslationsDialog *dialog1;
 	DictionaryEditDialog *dialog2;
 	TranslationDialog *sessionDialog;
-	QVector<TranslationItem *> trItemsv;
+	QList<TranslationItem *> trItemsL;
 	QTimer *sessionStartTimer;
 	
 	QAction *minimizeAction;

@@ -16,7 +16,7 @@ class MoveTranslationsDialog: public QDialog
 public:
 	explicit MoveTranslationsDialog(QWidget *parent=nullptr);
 	~MoveTranslationsDialog();
-	void setupTables(const QVector<TranslationItem*> &v);
+	void setupTables(const QList<TranslationItem*> &l);
 public slots:
 	void addTranslation(const TranslationItem *tip);
 	void removeTranslation(const TranslationItem *tip);

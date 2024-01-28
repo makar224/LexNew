@@ -7,9 +7,9 @@
 #include <QMessageBox>
 #include <QShowEvent>
 
-TranslationDialog::TranslationDialog(QWidget *parent, QVector<TranslationItem*>* tivp) :
+TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* tilp) :
 	QWidget(parent),
-	mTrItemsVPtr(tivp),
+	mTrItemsLPtr(tilp),
 	mRequestTrItem(nullptr),
 	nSessionInterval(5),
 	nAlternatives(5),
@@ -97,7 +97,7 @@ void TranslationDialog::alternativeChoosen(int index) {
 	}
 }
 void TranslationDialog::setSuccessesForExclusion(int num) {
-	for (TranslationItem *tip: *mTrItemsVPtr) {
+	for (TranslationItem *tip: *mTrItemsLPtr) {
 		if (tip->successCounter() >= num)
 			emit excludeTranslation(tip);
 	}
@@ -106,15 +106,15 @@ void TranslationDialog::setSuccessesForExclusion(int num) {
 // Подготавливаем диалог к выдаче запроса перевода
 bool TranslationDialog::prepareTranslationRequest()
 {
-	Q_ASSERT(nullptr != mTrItemsVPtr);
-	if (nullptr == mTrItemsVPtr) {
+	Q_ASSERT(nullptr != mTrItemsLPtr);
+	if (nullptr == mTrItemsLPtr) {
 		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Отсутствуют данные переводов."));
 		return false;
 	}
 
 	// отбираем неисключенные переводы в отдельный массив
 	QVector<TranslationItem *> workTrItemsv;
-	for (const TranslationItem * tip: *mTrItemsVPtr) {
+	for (const TranslationItem * tip: *mTrItemsLPtr) {
 		if (!tip->isExcluded())
 			workTrItemsv.append(const_cast<TranslationItem*>(tip));
 	}

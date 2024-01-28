@@ -8,11 +8,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-	trItemsv.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
-	trItemsv.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
-	trItemsv.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
-	trItemsv.append(new TranslationItem(tr("to arrive at"), tr("прибывать в"), true, true));
-	trItemsv.append(new TranslationItem(tr("to open with"), tr("открывать чем-н."), true, false));
+	trItemsL.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
+	trItemsL.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
+	trItemsL.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
+	trItemsL.append(new TranslationItem(tr("to arrive at"), tr("прибывать в"), true, true));
+	trItemsL.append(new TranslationItem(tr("to open with"), tr("открывать чем-н."), true, false));
 
 	ui->setupUi(this);
 
@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->moveTranslationsButton, &QPushButton::clicked,
 			dialog1, &QDialog::open);
 
-	dialog1->setupTables(trItemsv);
+	dialog1->setupTables(trItemsL);
 
 	dialog2 = new DictionaryEditDialog;
 	connect(dialog2, SIGNAL(addTranslationSig(const TranslationItem *)),
@@ -29,11 +29,11 @@ MainWindow::MainWindow(QWidget *parent)
 			this, SLOT(removeTranslation(const TranslationItem *)));
 	connect(dialog2, SIGNAL(editTranslationSig(const TranslationItem *)),
 			this, SLOT(editTranslation(const TranslationItem *)));
-	dialog2->setupTable(trItemsv);
+	dialog2->setupTable(trItemsL);
 	connect(ui->dictionaryEditAction, &QAction::triggered,
 			dialog2, &QDialog::open);
 
-	sessionDialog = new TranslationDialog(nullptr, &trItemsv);
+	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			dialog1, &MoveTranslationsDialog::excludeTranslation);
 
@@ -187,13 +187,13 @@ void MainWindow::restoreTranslationSettings() {
 }
 void MainWindow::addTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
-	trItemsv.append(const_cast<TranslationItem *>(tip));
+	trItemsL.append(const_cast<TranslationItem *>(tip));
 	dialog1->addTranslation(tip);
 }
 void MainWindow::removeTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
 	dialog1->removeTranslation(tip);
-	trItemsv.removeOne(const_cast<TranslationItem*>(tip));
+	trItemsL.removeOne(const_cast<TranslationItem*>(tip));
 	delete tip;
 }
 void MainWindow::editTranslation(const TranslationItem *tip) {
@@ -207,7 +207,7 @@ MainWindow::~MainWindow()
 	delete dialog1;
 	delete dialog2;
 	delete sessionDialog;
-	for (TranslationItem *tip: trItemsv)
+	for (TranslationItem *tip: trItemsL)
 		if (nullptr != tip)
 			delete tip;
 }

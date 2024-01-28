@@ -270,10 +270,10 @@ void MoveTranslationsDialog::editTranslation(const TranslationItem *tip) {
 		}
 	}
 }
-void MoveTranslationsDialog::setupTables(const QVector<TranslationItem*> &v) {
+void MoveTranslationsDialog::setupTables(const QList<TranslationItem*> &l) {
 	QTableWidget *tableWidget = nullptr;
 	int row = 0;
-	for(const TranslationItem *tip: v) {
+	for(const TranslationItem *tip: l) {
 		if (! tip->isExcluded())
 			tableWidget = currentTableWidget;
 		else

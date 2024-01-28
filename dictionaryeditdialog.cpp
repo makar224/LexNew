@@ -147,9 +147,9 @@ void DictionaryEditDialog::editTranslation(int row, int col) {
 		return;
 	emit editTranslationSig(tip);
 }
-void DictionaryEditDialog::setupTable(const QVector<TranslationItem*> &v) {
+void DictionaryEditDialog::setupTable(const QList<TranslationItem*> &l) {
 	int row = 0;
-	for(const TranslationItem *tip: v) {
+	for(const TranslationItem *tip: l) {
 		tableWidget->insertRow(row);
 		setupTableItemRow(row, tip);
 		++row;
