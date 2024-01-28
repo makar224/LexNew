@@ -137,7 +137,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	// формируем список возможных ответов без правильного ответа
 	QStringList answerAlternatives;
 	for (const TranslationItem *tip: workTrItemsv) {
-		altText = tip->isInvert()?tip->firstExpr():tip->secondExpr();
+		altText = mRequestTrItem->isInvert()?tip->firstExpr():tip->secondExpr();
 		if (altText != correctAnswer)
 			answerAlternatives << altText;
 	}
@@ -146,6 +146,7 @@ bool TranslationDialog::prepareTranslationRequest()
 		QMessageBox::warning(nullptr, tr("TranslationDialog"), tr("Недостаточно альтернатив перевода."));
 		return false;
 	}
+
 
 	mnComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
 	int ind = 0;
