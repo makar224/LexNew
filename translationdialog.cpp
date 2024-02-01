@@ -97,10 +97,11 @@ void TranslationDialog::alternativeChoosen(int index) {
 	}
 }
 void TranslationDialog::setSuccessesForExclusion(int num) {
-	for (TranslationItem *tip: *mTrItemsLPtr) {
-		if (tip->successCounter() >= num)
-			emit excludeTranslation(tip);
-	}
+	// Те TrItem-ы, в которых счетчики превышают заданный уровень - исключаются
+	//for (TranslationItem *tip: *mTrItemsLPtr) {
+	//	if (tip->successCounter() >= num)
+	//		emit excludeTranslation(tip);
+	//} // закомментировано - здесь - не исключаются - будут исключаться сразу после попадания в запрос перевода
 	nSuccessesForExclusion = num;
 }
 // Подготавливаем диалог к выдаче запроса перевода

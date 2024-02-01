@@ -8,6 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+	QCoreApplication::setOrganizationName("MyCompany");
+	QCoreApplication::setApplicationName("LexNew");
+
 	trItemsL.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
 	trItemsL.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
 	trItemsL.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
@@ -37,10 +40,27 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			dialog1, &MoveTranslationsDialog::excludeTranslation);
 
-	// Устанавливаем в диалоге переводов исходные значения с контролов
-	// ... загрузить установки из QSettings ...
-	restoreDefaultTranslationSettings(); // временно так
+	// Устанавливаем в диалоге переводов исходные значения
+	QSettings settings;
+	settings.beginGroup("MainWindow");
+	const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
+	if (geometry.isEmpty()) {
+		QRect screenRect = QGuiApplication::primaryScreen()->geometry();
+		setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
+	}
+	else
+		restoreGeometry(geometry);
+	settings.endGroup();
+	//QString dictionaryPath = settings.value("dictionaryPath", "").toString();
 
+	restoreDefaultTranslationSettings(); // значения по умолчанию - в контролы (для первой загрузки приложения)
+	settings.beginGroup("Translations");
+	ui->sessionIntervalSpinBox->setValue(settings.value("sessionInverval", ui->sessionIntervalSpinBox->value()).toInt());
+	ui->successTriesSpinBox->setValue(settings.value("successesForExclusion", ui->successTriesSpinBox->value()).toInt());
+	ui->alternativesSpinBox->setValue(settings.value("alternativesNumber", ui->alternativesSpinBox->value()).toInt());
+	ui->triesSpinBox->setValue(settings.value("triesNumber", ui->triesSpinBox->value()).toInt());
+	settings.endGroup();
+	applyTranslationSettings();
 	// ...
 
 	connect(ui->applyButton, &QPushButton::clicked,
@@ -64,22 +84,35 @@ MainWindow::MainWindow(QWidget *parent)
 	createTrayIcon();
 	connect(trayIcon, &QSystemTrayIcon::activated, this, &MainWindow::trayIconActivated);
 	trayIcon->show();
-	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
-	setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
+}
+void MainWindow::applicationQuit() {
+	QSettings settings;
+	settings.setValue("MainWindow/geometry", saveGeometry());
+
+	//settings.setValue("dictionaryPath", );
+
+	settings.beginGroup("Translations");
+	settings.setValue("sessionInverval", ui->sessionIntervalSpinBox->value());
+	settings.setValue("successesForExclusion", ui->successTriesSpinBox->value());
+	settings.setValue("alternativesNumber", ui->alternativesSpinBox->value());
+	settings.setValue("triesNumber", ui->triesSpinBox->value());
+	settings.endGroup();
 }
 bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
 		if (!sessionDialog->isVisible()) {
 			if (sessionDialog->prepareTranslationRequest())
-				sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
+				sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 		}
+
 		if (trayIcon->isVisible()) {
 			e->ignore();
 			hide();
 			return true;
 		}
 	}
-	else if (e->type() == QEvent::Show) {
+	else if (e->type() == QEvent::Show)
+	{
 		restoreTranslationSettings();
 		sessionStartTimer->stop();
 	}
@@ -91,7 +124,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 		if (event->type()==QEvent::Close /*|| event->type()==QEvent::Hide*/) {
 			if(!isVisible()) {
 				if (sessionDialog->prepareTranslationRequest())
-					sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 5 * 1000);
+					sessionStartTimer->start(ui->sessionIntervalSpinBox->value() * 60 * 1000);
 			}
 		}
 		else if (event->type() == QEvent::Show)
@@ -132,6 +165,7 @@ void MainWindow::createActions()
 	connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
 
 	quitAction = new QAction(tr("&Quit"), this);
+	connect(quitAction, &QAction::triggered, this, &MainWindow::applicationQuit);
 	connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 void MainWindow::createTrayIcon() {

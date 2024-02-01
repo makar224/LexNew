@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QSystemTrayIcon>
+#include <QSettings>
 #include "movetranslationsdialog.h"
 #include "dictionaryeditdialog.h"
 #include "translationmodel.h"
@@ -44,6 +45,7 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 private slots:
 	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+	void applicationQuit();
 private:
 	void createActions();
 	void createTrayIcon();
@@ -53,6 +55,8 @@ private:
 	TranslationDialog *sessionDialog;
 	QList<TranslationItem *> trItemsL;
 	QTimer *sessionStartTimer;
+
+	QSettings *settings;
 	
 	QAction *minimizeAction;
 	QAction *maximizeAction;

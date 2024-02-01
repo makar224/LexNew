@@ -270,6 +270,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="dictionaryEditAction"/>
+    <addaction name="dictionaryOpenAction"/>
     <addaction name="dictionarySaveAction"/>
     <addaction name="dictionarySaveAsAction"/>
     <addaction name="separator"/>
@@ -306,6 +307,11 @@
   <action name="exitAction">
    <property name="text">
     <string>Выход</string>
+   </property>
+  </action>
+  <action name="dictionaryOpenAction">
+   <property name="text">
+    <string>Открыть</string>
    </property>
   </action>
  </widget>
