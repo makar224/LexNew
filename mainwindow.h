@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QSystemTrayIcon>
-#include <QSettings>
 #include "movetranslationsdialog.h"
 #include "dictionaryeditdialog.h"
 #include "translationmodel.h"
@@ -28,35 +27,46 @@ public:
 protected slots:
 	void applyTranslationSettings();
 	void restoreDefaultTranslationSettings();
-	void restoreTranslationSettings();
-
-	void startTranslationDialog();
 
 	void addTranslation(const TranslationItem *tip);
 	void removeTranslation(const TranslationItem *tip);
 	void editTranslation(const TranslationItem *tip);
 
-signals:
-	void dictionaryAddTranslation(const TranslationItem*);
-	void dictionaryRemoveTranslation(const TranslationItem*);
-	void dictionaryEditTranslation(const TranslationItem*);
+//signals:
+	//void dictionaryAddTranslation(const TranslationItem*);
+	//void dictionaryRemoveTranslation(const TranslationItem*);
+	//void dictionaryEditTranslation(const TranslationItem*);
 protected:
 	bool event(QEvent *event) override;
 	bool eventFilter(QObject *, QEvent *) override;
 private slots:
+	void startTranslationDialog();
 	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 	void applicationQuit();
+	void newDictionary();
+	void openFile();
+	bool saveFile();
+	bool saveFileAs();
 private:
+	void restoreTranslationSettings();
 	void createActions();
 	void createTrayIcon();
+	bool processUnsavedChanges();
+	bool loadFile(const QString& path);
+	TranslationItem *processLine(const QString& line) const;
+	bool loadTempFile();
+	bool saveData(const QString& path);
+	bool saveTempFile() const;
+	void setDictFilePath(const QString& path);
+	void clearTrItems();
     Ui::MainWindow *ui;
-	MoveTranslationsDialog *dialog1;
-	DictionaryEditDialog *dialog2;
+	MoveTranslationsDialog *moveTranslationsDialog;
+	DictionaryEditDialog *dictEditDialog;
 	TranslationDialog *sessionDialog;
 	QList<TranslationItem *> trItemsL;
 	QTimer *sessionStartTimer;
 
-	QSettings *settings;
+	QString mDictionaryFilePath;
 	
 	QAction *minimizeAction;
 	QAction *maximizeAction;

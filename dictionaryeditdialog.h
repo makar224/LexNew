@@ -13,6 +13,7 @@ class DictionaryEditDialog : public QDialog
 	Q_OBJECT
 public:
 	explicit DictionaryEditDialog(QWidget *parent = nullptr);
+	void clearTable();
 	void setupTable(const QList<TranslationItem*> &l);
 protected:
 	bool eventFilter(QObject *, QEvent *) override;

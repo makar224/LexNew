@@ -119,6 +119,7 @@ void DictionaryEditDialog::addTranslation() {
 	int row = tableWidget->rowCount();
 	tableWidget->insertRow(row);
 	setupTableItemRow(row, tip);
+	//setWindowModified(true);
 	emit addTranslationSig(tip);
 }
 void DictionaryEditDialog::removeTranslation() {
@@ -129,6 +130,7 @@ void DictionaryEditDialog::removeTranslation() {
 	TranslationItem *tip = getRowTIFromData(sldRow);
 	Q_ASSERT(nullptr != tip);
 	tableWidget->removeRow(sldRow);
+	//setWindowModified(true);
 	emit removeTranslationSig(tip);
 }
 void DictionaryEditDialog::editTranslation(int row, int col) {
@@ -145,15 +147,24 @@ void DictionaryEditDialog::editTranslation(int row, int col) {
 		tip->setSecondExpr(tableWidget->item(row, col)->text());
 	else
 		return;
+	//setWindowModified(true);
 	emit editTranslationSig(tip);
 }
 void DictionaryEditDialog::setupTable(const QList<TranslationItem*> &l) {
+	clearTable();
 	int row = 0;
 	for(const TranslationItem *tip: l) {
 		tableWidget->insertRow(row);
 		setupTableItemRow(row, tip);
 		++row;
 	}
+	//setWindowModified(false);
+}
+void DictionaryEditDialog::clearTable() {
+	for (int row=tableWidget->rowCount()-1; row>=0; --row) {
+		tableWidget->removeRow(row);
+	}
+	//setWindowModified(false);
 }
 bool DictionaryEditDialog::setupTableItemRow(int row, const TranslationItem *tip)
 {

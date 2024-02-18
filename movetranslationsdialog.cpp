@@ -147,6 +147,7 @@ void MoveTranslationsDialog::changeDirection()
 		return;
 	rowtip->setInvert(rowtip->isInvert()?false:true);
 	setTableItemRow(widg, sldRow, rowtip);
+	//setWindowModified(true); // поля в строке меняются местами - флаг модификации долджен поддерживаться атвтоматически
 }
 void MoveTranslationsDialog::moveTranslation()
 {
@@ -175,6 +176,7 @@ void MoveTranslationsDialog::moveTranslation()
 	int contrSldRow = contrWidg->rowCount();
 	setupTableItemRow(contrWidg, contrSldRow, rowtip);
 	//contrWidg->setCurrentCell(contrSldRow, 0); // - важно установить, чтобы в след обработчике выделения итема (~после widg->removeRow) выделился current-ряд, где добавился ряд, иначе выделяется ряд в том table widget из которого удалился ряд
+	//setWindowModified(true);
 }
 void MoveTranslationsDialog::restoreAllTranslations() {
 	currentTableWidget->setSortingEnabled(false);
@@ -208,6 +210,7 @@ void MoveTranslationsDialog::restoreAllTranslations() {
 		setRowTIData(currentTableWidget, row1, rowtip);
 	}
 	currentTableWidget->setSortingEnabled(true);
+	//setWindowModified(true);
 }
 void MoveTranslationsDialog::excludeTranslation(TranslationItem *tip) {
 	TranslationItem *rowtip = nullptr;
@@ -219,6 +222,7 @@ void MoveTranslationsDialog::excludeTranslation(TranslationItem *tip) {
 			setupTableItemRow(exclusionTableWidget, exclusionTableWidget->rowCount(), rowtip);
 			tip->setExcluded(true);
 			//tip->resetSuccessCounter();
+			//setWindowModified(true);
 			return;
 		}
 	}
@@ -229,6 +233,7 @@ void MoveTranslationsDialog::addTranslation(const TranslationItem *tip)
 	Q_ASSERT(!tip->isExcluded());
 	int row = currentTableWidget->rowCount();
 	setupTableItemRow(currentTableWidget, row, tip);
+	//setWindowModified(true);
 }
 void MoveTranslationsDialog::removeTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
@@ -238,6 +243,7 @@ void MoveTranslationsDialog::removeTranslation(const TranslationItem *tip) {
 		if (tip == rowtip)
 		{
 			currentTableWidget->removeRow(row);
+			//setWindowModified(true);
 			return;
 		}
 	}
@@ -246,6 +252,7 @@ void MoveTranslationsDialog::removeTranslation(const TranslationItem *tip) {
 		if (tip == rowtip)
 		{
 			exclusionTableWidget->removeRow(row);
+			//setWindowModified(true);
 			return;
 		}
 	}
@@ -258,6 +265,7 @@ void MoveTranslationsDialog::editTranslation(const TranslationItem *tip) {
 		if (tip == rowtip)
 		{
 			setTableItemRow(currentTableWidget, row, tip);
+			//setWindowModified(true);
 			return;
 		}
 	}
@@ -266,11 +274,13 @@ void MoveTranslationsDialog::editTranslation(const TranslationItem *tip) {
 		if (tip == rowtip)
 		{
 			setTableItemRow(exclusionTableWidget, row, tip);
+			//setWindowModified(true);
 			return;
 		}
 	}
 }
 void MoveTranslationsDialog::setupTables(const QList<TranslationItem*> &l) {
+	clearTables();
 	QTableWidget *tableWidget = nullptr;
 	int row = 0;
 	for(const TranslationItem *tip: l) {
@@ -281,6 +291,15 @@ void MoveTranslationsDialog::setupTables(const QList<TranslationItem*> &l) {
 		row = tableWidget->rowCount();
 		setupTableItemRow(tableWidget, row, tip);
 	}
+	setWindowModified(false);
+}
+void MoveTranslationsDialog::clearTables() {
+	int row = currentTableWidget->rowCount()-1;
+	for (;row>=0; --row)
+		currentTableWidget->removeRow(row);
+	for (row=exclusionTableWidget->rowCount()-1; row>=0; --row)
+		exclusionTableWidget->removeRow(row);
+	setWindowModified(false);
 }
 // Процедура - itemы уже существуют в них только нужно установить текст поля
 void MoveTranslationsDialog::setTableItemRow(QTableWidget *w, int row, const TranslationItem *tip) {

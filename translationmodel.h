@@ -1,12 +1,15 @@
 #ifndef TRANSLATIONMODEL_H
 #define TRANSLATIONMODEL_H
 
+#include <iostream>
+using std::istream;
+using std::ostream;
 #include <QString>
 #include <QPair>
 
 class TranslationItem {
 public:
-	//TranslationItem():invert(false), excluded(false) {}
+	TranslationItem();
 	TranslationItem(const QString &expr1, const QString &expr2, bool excl=false, bool inv=false);
 	int successCounter() {return nSuccessCounter;}
 	void setInvert(bool b) {invert = b;}
@@ -23,6 +26,9 @@ public:
 	QString secondExpr() const {return exprs.second;}
 	void incrSuccessCounter() {++nSuccessCounter;}
 	void resetSuccessCounter() {nSuccessCounter=0;}
+
+	friend istream& operator>>(istream&, TranslationItem&);
+	friend ostream& operator<<(ostream&, const TranslationItem&);
 
 private:
 	QPair<QString, QString> exprs;
