@@ -32,13 +32,24 @@ MainWindow::MainWindow(QWidget *parent)
 		restoreGeometry(geometry);
 	settings.endGroup();
 
+	mDictionaryFilePath = settings.value("dictionaryFilePath", "").toString();
+
 	/*trItemsL.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
 	trItemsL.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
 	trItemsL.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
 	trItemsL.append(new TranslationItem(tr("to arrive at"), tr("прибывать в"), true, true));
 	trItemsL.append(new TranslationItem(tr("to open with"), tr("открывать чем-н."), true, false));*/
+
 	// загружаем временный файл заучивания (если он есть)
-	loadTempFile();
+	if (! loadTempFile()) {
+		ifstream is("default.txt", ios::in);
+		if (is) // файл открыт для чтения, значит он сущетсвует
+			QMessageBox::warning(nullptr, tr("Загрузка приложения"),
+								 tr("Не удалось загрузить данные о заучивании."));
+		if (!mDictionaryFilePath.isEmpty()) {
+			loadFile(mDictionaryFilePath);
+		}
+	}
 
 	ui->setupUi(this);
 
@@ -73,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
 			moveTranslationsDialog, &MoveTranslationsDialog::excludeTranslation);
 
 	// Загружаем настройки приложения
-	mDictionaryFilePath = settings.value("dictionaryFilePath", "").toString();
+
 	// Устанавливаем в диалоге переводов исходные значения
 	restoreDefaultTranslationSettings(); // значения по умолчанию - в контролы (для первой загрузки приложения)
 	settings.beginGroup("Translations");
@@ -120,10 +131,12 @@ void MainWindow::applicationQuit() {
 	settings.setValue("triesNumber", ui->triesSpinBox->value());
 	settings.endGroup();
 
-	processUnsavedChanges();
 	if (! saveTempFile()) {
-		//... обработка ошибок ...
+		QMessageBox::warning(nullptr, tr("Выход из приложения"),
+							 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
 	}
+
+	processUnsavedChanges();
 }
 bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
