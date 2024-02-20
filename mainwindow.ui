@@ -255,9 +255,9 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="separator"/>
     <addaction name="dictionaryNewAction"/>
     <addaction name="dictionaryOpenAction"/>
+    <addaction name="editDictionaryAction"/>
     <addaction name="dictionarySaveAction"/>
     <addaction name="dictionarySaveAsAction"/>
     <addaction name="separator"/>
@@ -299,6 +299,11 @@
   <action name="dictionaryOpenAction">
    <property name="text">
     <string>Открыть...</string>
+   </property>
+  </action>
+  <action name="editDictionaryAction">
+   <property name="text">
+    <string>Редактировать...</string>
    </property>
   </action>
  </widget>

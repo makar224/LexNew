@@ -71,13 +71,18 @@ MainWindow::MainWindow(QWidget *parent)
 	dictEditDialog->setWindowModified(false);
 	connect(ui->dictionaryNewAction, &QAction::triggered,
 			this, &MainWindow::newDictionary);
-
 	connect(ui->dictionaryOpenAction, &QAction::triggered,
 			this, &MainWindow::openFile);
+	connect(ui->editDictionaryAction, &QAction::triggered,
+			dictEditDialog, &QDialog::open);
 	connect(ui->dictionarySaveAction, &QAction::triggered,
 			this, &MainWindow::saveFile);
 	connect(ui->dictionarySaveAsAction, &QAction::triggered,
 			this, &MainWindow::saveFileAs);
+	connect(ui->exitAction, &QAction::triggered,
+			this, &MainWindow::applicationQuit);
+	connect(ui->exitAction, &QAction::triggered,
+			qApp, &QCoreApplication::quit);
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
@@ -122,7 +127,7 @@ void MainWindow::applicationQuit() {
 	QSettings settings;
 	settings.setValue("MainWindow/geometry", saveGeometry());
 
-	settings.setValue("dictionaryPath", mDictionaryFilePath);
+	settings.setValue("dictionaryFilePath", mDictionaryFilePath);
 
 	settings.beginGroup("Translations");
 	settings.setValue("sessionInverval", ui->sessionIntervalSpinBox->value());
@@ -280,6 +285,7 @@ void MainWindow::newDictionary() {
 	moveTranslationsDialog->clearTables();
 	mDictionaryFilePath.clear();
 	clearTrItems();
+	QFile("default.txt").remove();
 	dictEditDialog->open();
 }
 void MainWindow::openFile() {
@@ -288,6 +294,7 @@ void MainWindow::openFile() {
 		QString filePath = QFileDialog::getOpenFileName(this, tr("Открытие файла словаря"), ".");
 		if (!filePath.isEmpty()) {
 			if (loadFile(filePath)) {
+				QFile("default.txt").remove();
 				dictEditDialog->setupTable(trItemsL);
 				moveTranslationsDialog->setupTables(trItemsL);
 				dictEditDialog->open();
