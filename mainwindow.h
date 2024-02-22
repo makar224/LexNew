@@ -41,6 +41,7 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 private slots:
 	void startTranslationDialog();
+	void menuAboutToShow();
 	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 	void applicationQuit();
 	void newDictionary();

@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 	moveTranslationsDialog->setWindowModified(false);
 
 	dictEditDialog = new DictionaryEditDialog;
+	dictEditDialog->installEventFilter(this);
 	connect(dictEditDialog, SIGNAL(addTranslationSig(const TranslationItem *)),
 			this, SLOT(addTranslation(const TranslationItem *)));
 	connect(dictEditDialog, SIGNAL(removeTranslationSig(const TranslationItem *)),
@@ -85,8 +86,10 @@ MainWindow::MainWindow(QWidget *parent)
 			qApp, &QCoreApplication::quit);
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
+	sessionDialog->installEventFilter(this);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			moveTranslationsDialog, &MoveTranslationsDialog::excludeTranslation);
+
 
 	// Загружаем настройки приложения
 
@@ -106,10 +109,6 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->restoreDefaultsButton, &QPushButton::clicked,
 			this, &MainWindow::restoreDefaultTranslationSettings);
 
-	connect(ui->closeButton, &QPushButton::clicked,
-			this, &QMainWindow::close);
-
-	sessionDialog->installEventFilter(this);
 	connect(ui->startSessionButton, &QPushButton::clicked,
 				this, &MainWindow::startTranslationDialog);
 	sessionStartTimer = new QTimer();
@@ -117,6 +116,12 @@ MainWindow::MainWindow(QWidget *parent)
 	//			sessionDialog, &QWidget::showNormal);
 	connect(sessionStartTimer, &QTimer::timeout,
 			this, &MainWindow::startTranslationDialog);
+
+	connect(ui->menu, &QMenu::aboutToShow,
+			this, &MainWindow::menuAboutToShow);
+
+	connect(ui->closeButton, &QPushButton::clicked,
+			this, &QMainWindow::close);
 
 	createActions();
 	createTrayIcon();
@@ -162,6 +167,7 @@ bool MainWindow::event(QEvent *e) {
 		sessionStartTimer->stop();
 	}
 
+
 	return QMainWindow::event(e);
 }
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
@@ -177,6 +183,20 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			sessionStartTimer->stop(); // -не обязательно: диалог может быть открыт по кнопке или по таймеру. Если по кнопке то таймер дб уже остановлен,
 			// если по таймеру, то тоже остановлен - время истекло
 			hide();
+		}
+		else if(event->type() == QEvent::MouseButtonPress) {
+		// предполагаем, что выбран ответ и счетчик какого-то TranslationItem изменился
+			moveTranslationsDialog->setWindowModified(true);
+		}
+	}
+	if (obj == dictEditDialog) {
+		if (event->type() == QEvent::UpdateRequest) {
+			QString shownName = "Untitled";
+			if (!mDictionaryFilePath.isEmpty())
+				shownName = QFileInfo(mDictionaryFilePath).fileName();
+			dictEditDialog->setWindowTitle(tr("%1%2 - %3").arg(shownName)
+										   .arg(dictEditDialog->isWindowModified()?"[*]":"")
+										   .arg("Edit"));
 		}
 	}
 
@@ -197,6 +217,9 @@ void MainWindow::startTranslationDialog()
 			sessionDialog->showNormal();
 	}
 
+}
+void MainWindow::menuAboutToShow() {
+	ui->dictionarySaveAction->setEnabled(dictEditDialog->isWindowModified());
 }
 void MainWindow::createActions()
 {
@@ -267,7 +290,7 @@ void MainWindow::restoreTranslationSettings() {
 bool MainWindow::processUnsavedChanges() {
 	if (dictEditDialog->isWindowModified()) {
 		int r = QMessageBox::warning(this,
-									 tr("Dictionary"), tr("The document has been modified.\n"
+									 tr("Edit"), tr("The dictionary has been modified.\n"
 														   "Do you want to save your changes?"),
 									 QMessageBox::Yes | QMessageBox::Default,
 									 QMessageBox::No,
@@ -382,6 +405,7 @@ bool MainWindow::saveData(const QString& path) {
 }
 void MainWindow::setDictFilePath(const QString& path) {
 	mDictionaryFilePath = path;
+	ui->dictionarySaveAction->setEnabled(false);
 	dictEditDialog->setWindowModified(false);
 	moveTranslationsDialog->setWindowModified(false);
 }
