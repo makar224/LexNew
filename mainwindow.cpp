@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
 			this, &MainWindow::applicationQuit);
 	//connect(ui->exitAction, &QAction::triggered,
 	//		qApp, &QCoreApplication::quit);
-	connect(this, &MainWindow::applicationQuitSig,
+	connect(this, &MainWindow::quitApplication,
 			qApp, &QCoreApplication::quit);
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
@@ -143,13 +143,13 @@ void MainWindow::applicationQuit() {
 	settings.setValue("triesNumber", ui->triesSpinBox->value());
 	settings.endGroup();
 
-	if (! saveTempFile()) {
-		QMessageBox::warning(nullptr, tr("Выход из приложения"),
-							 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
-	}
+	//if (! saveTempFile()) {
+	//	QMessageBox::warning(nullptr, tr("Выход из приложения"),
+	//						 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
+	//}
 
 	if (processUnsavedChanges()) {
-		emit applicationQuitSig();
+		emit quitApplication();
 	}
 }
 bool MainWindow::event(QEvent *e) {
@@ -334,8 +334,11 @@ bool MainWindow::saveFile() {
 	{
 		if (!saveData(mDictionaryFilePath))
 			return false;
-		//if (! saveTempFile())
-		//	return false;
+		if (! saveTempFile()) {
+			QMessageBox::warning(nullptr, tr("Saving data"),
+								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
+			//return false;
+		}
 		return true;
 	}
 	else
@@ -346,8 +349,11 @@ bool MainWindow::saveFileAs() {
 	if (!mDictionaryFilePath.isEmpty()) {
 		if (! saveData(mDictionaryFilePath))
 			return false;
-		//if (! saveTempFile())
-		//	return false;
+		if (! saveTempFile()) {
+			QMessageBox::warning(nullptr, tr("Saving data"),
+								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
+			//return false;
+		}
 		return true;
 	}
 	return false;

@@ -36,7 +36,7 @@ signals:
 	//void dictionaryAddTranslation(const TranslationItem*);
 	//void dictionaryRemoveTranslation(const TranslationItem*);
 	//void dictionaryEditTranslation(const TranslationItem*);
-	void applicationQuitSig();
+	void quitApplication();
 protected:
 	bool event(QEvent *event) override;
 	bool eventFilter(QObject *, QEvent *) override;
