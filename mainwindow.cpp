@@ -82,7 +82,9 @@ MainWindow::MainWindow(QWidget *parent)
 			this, &MainWindow::saveFileAs);
 	connect(ui->exitAction, &QAction::triggered,
 			this, &MainWindow::applicationQuit);
-	connect(ui->exitAction, &QAction::triggered,
+	//connect(ui->exitAction, &QAction::triggered,
+	//		qApp, &QCoreApplication::quit);
+	connect(this, &MainWindow::applicationQuitSig,
 			qApp, &QCoreApplication::quit);
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
@@ -146,7 +148,9 @@ void MainWindow::applicationQuit() {
 							 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
 	}
 
-	processUnsavedChanges();
+	if (processUnsavedChanges()) {
+		emit applicationQuitSig();
+	}
 }
 bool MainWindow::event(QEvent *e) {
 	if (e->type() == QEvent::Close) {
@@ -234,7 +238,7 @@ void MainWindow::createActions()
 
 	quitAction = new QAction(tr("&Quit"), this);
 	connect(quitAction, &QAction::triggered, this, &MainWindow::applicationQuit);
-	connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+	//connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 void MainWindow::createTrayIcon() {
 	trayIconMenu = new QMenu(this);
@@ -405,7 +409,6 @@ bool MainWindow::saveData(const QString& path) {
 }
 void MainWindow::setDictFilePath(const QString& path) {
 	mDictionaryFilePath = path;
-	ui->dictionarySaveAction->setEnabled(false);
 	dictEditDialog->setWindowModified(false);
 	moveTranslationsDialog->setWindowModified(false);
 }

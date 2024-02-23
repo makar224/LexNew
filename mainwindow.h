@@ -32,10 +32,11 @@ protected slots:
 	void removeTranslation(const TranslationItem *tip);
 	void editTranslation(const TranslationItem *tip);
 
-//signals:
+signals:
 	//void dictionaryAddTranslation(const TranslationItem*);
 	//void dictionaryRemoveTranslation(const TranslationItem*);
 	//void dictionaryEditTranslation(const TranslationItem*);
+	void applicationQuitSig();
 protected:
 	bool event(QEvent *event) override;
 	bool eventFilter(QObject *, QEvent *) override;
