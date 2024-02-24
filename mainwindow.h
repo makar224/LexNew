@@ -54,11 +54,11 @@ private:
 	void createActions();
 	void createTrayIcon();
 	bool processUnsavedChanges();
-	bool loadFile(const QString& path);
+	bool loadDictionary(const QString& path);
 	TranslationItem *processLine(const QString& line) const;
-	bool loadTempFile();
-	bool saveData(const QString& path);
-	bool saveTempFile() const;
+	bool saveDictionary(const QString& path);
+	bool loadMemoData();
+	bool saveMemoData() const;
 	void setDictFilePath(const QString& path);
 	void clearTrItems();
     Ui::MainWindow *ui;

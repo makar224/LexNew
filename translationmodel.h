@@ -11,11 +11,12 @@ class TranslationItem {
 public:
 	TranslationItem();
 	TranslationItem(const QString &expr1, const QString &expr2, bool excl=false, bool inv=false);
-	int successCounter() {return nSuccessCounter;}
+	int successCounter() const {return nSuccessCounter;}
 	void setInvert(bool b) {invert = b;}
 	void setExcluded(bool b) {excluded = b;}
 	bool isInvert() const {return invert;}
 	bool isExcluded() const {return excluded;}
+	void setSuccessCounter(int n) {nSuccessCounter=n;}
 	void setFirstExpr(const QString &str) {
 		exprs.first = str;
 	}

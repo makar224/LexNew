@@ -20,45 +20,17 @@ MainWindow::MainWindow(QWidget *parent)
 	QCoreApplication::setOrganizationName("MyCompany");
 	QCoreApplication::setApplicationName("LexNew");
 
-	// Загружаем позицию окна из settings
-	QSettings settings;
-	settings.beginGroup("MainWindow");
-	const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
-	if (geometry.isEmpty()) {
-		QRect screenRect = QGuiApplication::primaryScreen()->geometry();
-		setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
-	}
-	else
-		restoreGeometry(geometry);
-	settings.endGroup();
-
-	mDictionaryFilePath = settings.value("dictionaryFilePath", "").toString();
-
 	/*trItemsL.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
 	trItemsL.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
 	trItemsL.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
 	trItemsL.append(new TranslationItem(tr("to arrive at"), tr("прибывать в"), true, true));
 	trItemsL.append(new TranslationItem(tr("to open with"), tr("открывать чем-н."), true, false));*/
 
-	// загружаем временный файл заучивания (если он есть)
-	if (! loadTempFile()) {
-		ifstream is("default.txt", ios::in);
-		if (is) // файл открыт для чтения, значит он сущетсвует
-			QMessageBox::warning(nullptr, tr("Загрузка приложения"),
-								 tr("Не удалось загрузить данные о заучивании."));
-		if (!mDictionaryFilePath.isEmpty()) {
-			loadFile(mDictionaryFilePath);
-		}
-	}
-
 	ui->setupUi(this);
 
 	moveTranslationsDialog = new MoveTranslationsDialog;
 	connect(ui->moveTranslationsButton, &QPushButton::clicked,
 			moveTranslationsDialog, &QDialog::open);
-
-	moveTranslationsDialog->setupTables(trItemsL);
-	moveTranslationsDialog->setWindowModified(false);
 
 	dictEditDialog = new DictionaryEditDialog;
 	dictEditDialog->installEventFilter(this);
@@ -68,8 +40,6 @@ MainWindow::MainWindow(QWidget *parent)
 			this, SLOT(removeTranslation(const TranslationItem *)));
 	connect(dictEditDialog, SIGNAL(editTranslationSig(const TranslationItem *)),
 			this, SLOT(editTranslation(const TranslationItem *)));
-	dictEditDialog->setupTable(trItemsL);
-	dictEditDialog->setWindowModified(false);
 	connect(ui->dictionaryNewAction, &QAction::triggered,
 			this, &MainWindow::newDictionary);
 	connect(ui->dictionaryOpenAction, &QAction::triggered,
@@ -92,9 +62,20 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			moveTranslationsDialog, &MoveTranslationsDialog::excludeTranslation);
 
-
 	// Загружаем настройки приложения
+	// Загружаем позицию окна из settings
+	QSettings settings;
+	settings.beginGroup("MainWindow");
+	const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
+	if (geometry.isEmpty()) {
+		QRect screenRect = QGuiApplication::primaryScreen()->geometry();
+		setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
+	}
+	else
+		restoreGeometry(geometry);
+	settings.endGroup();
 
+	mDictionaryFilePath = settings.value("dictionaryFilePath", "").toString();
 	// Устанавливаем в диалоге переводов исходные значения
 	restoreDefaultTranslationSettings(); // значения по умолчанию - в контролы (для первой загрузки приложения)
 	settings.beginGroup("Translations");
@@ -104,7 +85,30 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->triesSpinBox->setValue(settings.value("triesNumber", ui->triesSpinBox->value()).toInt());
 	settings.endGroup();
 	applyTranslationSettings();
-	// ...
+
+	// Загружаем данные из файлов
+	/*// загружаем временный файл заучивания (если он есть)
+	if (! loadTempFile()) {
+		ifstream is("default.txt", ios::in);
+		if (is) // файл открыт для чтения, значит он сущетсвует
+			QMessageBox::warning(nullptr, tr("Загрузка приложения"),
+								 tr("Не удалось загрузить данные о заучивании."));
+		if (!mDictionaryFilePath.isEmpty()) {
+			loadFile(mDictionaryFilePath);
+		}
+	}*/
+	if (!mDictionaryFilePath.isEmpty()) {
+		if (! loadDictionary(mDictionaryFilePath)) {
+			QMessageBox::critical(nullptr, tr("Application loading"),
+								 tr("Failed to load dictionary."));
+		}
+		if (! loadMemoData()) {
+			ifstream is("default.txt", ios::in);
+			if (is) // файл открыт для чтения, значит он сущетсвует
+				QMessageBox::warning(nullptr, tr("Application loading"),
+									 tr("Failed to load memorizing data."));
+		}
+	}
 
 	connect(ui->applyButton, &QPushButton::clicked,
 			this, &MainWindow::applyTranslationSettings);
@@ -124,6 +128,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(ui->closeButton, &QPushButton::clicked,
 			this, &QMainWindow::close);
+
+
+	moveTranslationsDialog->setupTables(trItemsL);
+	moveTranslationsDialog->setWindowModified(false);
+	dictEditDialog->setupTable(trItemsL);
+	dictEditDialog->setWindowModified(false);
 
 	createActions();
 	createTrayIcon();
@@ -148,6 +158,10 @@ void MainWindow::applicationQuit() {
 	//						 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
 	//}
 
+	if (! saveMemoData()) {
+		QMessageBox::warning(nullptr, tr("Application quit"),
+							 tr("Failed to save memorizing data. All the memorizing information will be lost."));
+	}
 	if (processUnsavedChanges()) {
 		emit quitApplication();
 	}
@@ -320,7 +334,7 @@ void MainWindow::openFile() {
 
 		QString filePath = QFileDialog::getOpenFileName(this, tr("Открытие файла словаря"), ".");
 		if (!filePath.isEmpty()) {
-			if (loadFile(filePath)) {
+			if (loadDictionary(filePath)) {
 				QFile("default.txt").remove();
 				dictEditDialog->setupTable(trItemsL);
 				moveTranslationsDialog->setupTables(trItemsL);
@@ -332,13 +346,13 @@ void MainWindow::openFile() {
 bool MainWindow::saveFile() {
 	if (!mDictionaryFilePath.isEmpty())
 	{
-		if (!saveData(mDictionaryFilePath))
+		if (!saveDictionary(mDictionaryFilePath))
 			return false;
-		if (! saveTempFile()) {
-			QMessageBox::warning(nullptr, tr("Saving data"),
-								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
-			//return false;
-		}
+//		if (! saveTempFile()) {
+//			QMessageBox::warning(nullptr, tr("Saving data"),
+//								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
+//			//return false;
+//		}
 		return true;
 	}
 	else
@@ -347,34 +361,35 @@ bool MainWindow::saveFile() {
 bool MainWindow::saveFileAs() {
 	mDictionaryFilePath = QFileDialog::getSaveFileName(this, tr("Сохранение файла словаря"), ".");
 	if (!mDictionaryFilePath.isEmpty()) {
-		if (! saveData(mDictionaryFilePath))
+		if (! saveDictionary(mDictionaryFilePath))
 			return false;
-		if (! saveTempFile()) {
-			QMessageBox::warning(nullptr, tr("Saving data"),
-								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
-			//return false;
-		}
+//		if (! saveTempFile()) {
+//			QMessageBox::warning(nullptr, tr("Saving data"),
+//								 tr("Не удалось сохранить данные о заучивании. Вся информация будет потеряна."));
+//			//return false;
+//		}
 		return true;
 	}
 	return false;
 }
-bool MainWindow::loadFile(const QString& path) {
+bool MainWindow::loadDictionary(const QString& path) {
 	QFile file(path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
 	QTextStream in(&file);
 	clearTrItems();
-	QString line = in.readLine();
 	TranslationItem *tip = nullptr;
-	while (!line.isNull()) {
-		if (nullptr==(tip=processLine(line))) {
-			line = in.readLine();
-			continue;
-		}
-		trItemsL.append(tip);
-
+	QString line;
+	while (true) {
 		line = in.readLine();
+		if (in.status() != QTextStream::Ok)
+			return false;
+		if (line.isNull())
+			break;
+		if (nullptr==(tip=processLine(line)))
+			continue;
+		trItemsL.append(tip);
 	}
 
 	setDictFilePath(path);
@@ -392,7 +407,7 @@ TranslationItem* MainWindow::processLine(const QString& line) const {
 		return nullptr;
 	return new TranslationItem(expr1, expr2);
 }
-bool MainWindow::saveData(const QString& path) {
+bool MainWindow::saveDictionary(const QString& path) {
 	QFile file(path);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
 		return false;
@@ -418,19 +433,52 @@ void MainWindow::setDictFilePath(const QString& path) {
 	dictEditDialog->setWindowModified(false);
 	moveTranslationsDialog->setWindowModified(false);
 }
-bool MainWindow::saveTempFile() const {
+bool MainWindow::loadMemoData() {
+	if (trItemsL.isEmpty())
+		return true;
+	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
+	if (!ifs)
+		return false;
+	bool b = false;
+	int n = 0;
+	foreach(TranslationItem *tip, trItemsL) {
+		if (ifs.eof())
+			return false;
+		ifs >> std::boolalpha >> b;
+		if (ifs.fail()  || ifs.eof())
+			return false;
+		tip->setExcluded(b);
+		ifs >> std::boolalpha >> b;
+		if (ifs.fail() || ifs.eof())
+			return false;
+		tip->setInvert(b);
+		ifs >> n;
+		if (ifs.fail())
+			return false;
+		tip->setSuccessCounter(n);
+	}
+	return true;
+}
+bool MainWindow::saveMemoData() const {
+	if (trItemsL.isEmpty())
+		return true;
 	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
 	if (!ofs)
 		return false;
 	foreach(const TranslationItem *tip, trItemsL) {
-		ofs << *tip;
-		if (! ofs) {
+		ofs << std::boolalpha << tip->isExcluded();
+		if (! ofs)
 			return false;
-		}
+		ofs << std::boolalpha << tip->isInvert();
+		if (! ofs)
+			return false;
+		ofs << tip->successCounter();
+		if (! ofs)
+			return false;
 	}
 	return true;
 }
-bool MainWindow::loadTempFile() {
+/*bool MainWindow::loadTempFile() {
 	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
 	if (!ifs)
 		return false;
@@ -447,6 +495,18 @@ bool MainWindow::loadTempFile() {
 	}
 	return true;
 }
+bool MainWindow::saveTempFile() const {
+	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
+	if (!ofs)
+		return false;
+	foreach(const TranslationItem *tip, trItemsL) {
+		ofs << *tip;
+		if (! ofs) {
+			return false;
+		}
+	}
+	return true;
+}*/
 void MainWindow::addTranslation(const TranslationItem *tip) {
 	Q_ASSERT(nullptr != tip);
 	trItemsL.append(const_cast<TranslationItem *>(tip));
