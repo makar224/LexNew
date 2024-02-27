@@ -58,11 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
 	sessionDialog->installEventFilter(this);
-	//sessionDialog->alternativesBox()->view()->installEventFilter(this);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			moveTranslationsDialog, &MoveTranslationsDialog::excludeTranslation);
-	//connect(sessionDialog->alternativesBox(), &QComboBox::activated,
-	//		this, &MainWindow::sessionDialogAlternativesBoxActivated);
 	connect(sessionDialog->alternativesBox(), SIGNAL(activated(int)),
 			this, SLOT(sessionDialogAlternativesBoxActivated(int)));
 
@@ -191,25 +188,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			// если по таймеру, то тоже остановлен - время истекло
 			//hide();
 		}
-		/*else if(event->type() == QEvent::MouseButtonPress) {
-		// предполагаем, что выбран ответ и счетчик какого-то TranslationItem изменился
-			moveTranslationsDialog->setWindowModified(true);
-			qDebug() << "Mouse button press";
-		}*/
-		/*else {
-			QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
-			if (mouseEvent) {
-				mouseEvent->ignore();
-			}
-		}*/
 	}
-	/*else if (obj == sessionDialog->alternativesBox()->view()) {
-			if (event->type() == QEvent::MouseButtonPress) {
-			// предполагаем, что выбран ответ и счетчик какого-то TranslationItem изменился
-				moveTranslationsDialog->setWindowModified(true);
-				qDebug() << "Mouse button press";
-			}
-	}*/
 	else if (obj == dictEditDialog) {
 		if (event->type() == QEvent::UpdateRequest) {
 			QString shownName = "Untitled";

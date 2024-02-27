@@ -33,9 +33,6 @@ protected slots:
 	void editTranslation(const TranslationItem *tip);
 
 signals:
-	//void dictionaryAddTranslation(const TranslationItem*);
-	//void dictionaryRemoveTranslation(const TranslationItem*);
-	//void dictionaryEditTranslation(const TranslationItem*);
 	void quitApplication();
 protected:
 	bool event(QEvent *event) override;
