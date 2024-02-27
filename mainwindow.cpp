@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QMouseEvent>
 #include <QDebug>
 
 #include <fstream>
@@ -57,8 +58,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 	sessionDialog = new TranslationDialog(nullptr, &trItemsL);
 	sessionDialog->installEventFilter(this);
+	//sessionDialog->alternativesBox()->view()->installEventFilter(this);
 	connect(sessionDialog, &TranslationDialog::excludeTranslation,
 			moveTranslationsDialog, &MoveTranslationsDialog::excludeTranslation);
+	//connect(sessionDialog->alternativesBox(), &QComboBox::activated,
+	//		this, &MainWindow::sessionDialogAlternativesBoxActivated);
+	connect(sessionDialog->alternativesBox(), SIGNAL(activated(int)),
+			this, SLOT(sessionDialogAlternativesBoxActivated(int)));
 
 	// Загружаем настройки приложения
 	// Загружаем позицию окна из settings
@@ -183,14 +189,28 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 		{
 			sessionStartTimer->stop(); // -не обязательно: диалог может быть открыт по кнопке или по таймеру. Если по кнопке то таймер дб уже остановлен,
 			// если по таймеру, то тоже остановлен - время истекло
-			hide();
+			//hide();
 		}
-		else if(event->type() == QEvent::MouseButtonPress) {
+		/*else if(event->type() == QEvent::MouseButtonPress) {
 		// предполагаем, что выбран ответ и счетчик какого-то TranslationItem изменился
 			moveTranslationsDialog->setWindowModified(true);
-		}
+			qDebug() << "Mouse button press";
+		}*/
+		/*else {
+			QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
+			if (mouseEvent) {
+				mouseEvent->ignore();
+			}
+		}*/
 	}
-	if (obj == dictEditDialog) {
+	/*else if (obj == sessionDialog->alternativesBox()->view()) {
+			if (event->type() == QEvent::MouseButtonPress) {
+			// предполагаем, что выбран ответ и счетчик какого-то TranslationItem изменился
+				moveTranslationsDialog->setWindowModified(true);
+				qDebug() << "Mouse button press";
+			}
+	}*/
+	else if (obj == dictEditDialog) {
 		if (event->type() == QEvent::UpdateRequest) {
 			QString shownName = "Untitled";
 			if (!mDictionaryFilePath.isEmpty())
@@ -214,10 +234,10 @@ void MainWindow::startTranslationDialog()
 	else if (qobject_cast<QPushButton*>(QObject::sender()) == ui->startSessionButton)
 	{
 		// вызов по кнопке
+		sessionDialog->setWindowModality(Qt::WindowModal);
 		if (sessionDialog->prepareTranslationRequest())
 			sessionDialog->showNormal();
 	}
-
 }
 void MainWindow::menuAboutToShow() {
 	ui->dictionarySaveAction->setEnabled(dictEditDialog->isWindowModified());
@@ -260,6 +280,9 @@ void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
 		;
 	}
 }
+void MainWindow::sessionDialogAlternativesBoxActivated(int) {
+	moveTranslationsDialog->setWindowModified(true);
+}
 void MainWindow::setVisible(bool visible)
 {
 	minimizeAction->setEnabled(visible);
@@ -280,6 +303,8 @@ void MainWindow::applyTranslationSettings() {
 	sessionDialog->setSuccessesForExclusion(ui->successTriesSpinBox->value());
 	sessionDialog->setAlternativesNumber(ui->alternativesSpinBox->value());
 	sessionDialog->setTriesNumber(ui->triesSpinBox->value());
+	if (sessionDialog->isVisible())
+		sessionDialog->prepareTranslationRequest();
 }
 void MainWindow::restoreTranslationSettings() {
 	ui->sessionIntervalSpinBox->setValue(sessionDialog->sessionInterval());

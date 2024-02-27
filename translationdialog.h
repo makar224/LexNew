@@ -20,6 +20,7 @@ public:
 	int successesForExclusion() {return nSuccessesForExclusion;}
 	int alternativesNumber() {return nAlternatives;}
 	int triesNumber() {return nTries;}
+	QComboBox* alternativesBox() const {return mAlternativesBox;}
 
 	void setSessionInterval(int num) { nSessionInterval = num;}
 	void setSuccessesForExclusion(int num);
@@ -38,7 +39,7 @@ protected:
 
 private:
 	QLabel *requestLabel;
-	QComboBox *alternativesBox;
+	QComboBox *mAlternativesBox;
 	QPushButton *closeButton;
 	QPushButton *okButton;
 	QList<TranslationItem*>* mTrItemsLPtr;

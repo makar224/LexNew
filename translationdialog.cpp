@@ -20,8 +20,8 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
 	requestLabel = new QLabel(this);
-	alternativesBox = new QComboBox(this);
-	alternativesBox->setEditable(false);
+	mAlternativesBox = new QComboBox(this);
+	mAlternativesBox->setEditable(false);
 	//alternativesBox->setDuplicatesEnabled(false); // запрещение добавлять из edit одинаковые строки (-пользователем-не программно)
 	closeButton = new QPushButton(this);
 	connect(closeButton, &QPushButton::clicked,
@@ -35,7 +35,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	vlayout->setSpacing(10);
 	vlayout->addWidget(requestLabel);
 	QHBoxLayout *hlayout = new QHBoxLayout;
-	hlayout->addWidget(alternativesBox);
+	hlayout->addWidget(mAlternativesBox);
 	hlayout->addWidget(okButton);
 	vlayout->addLayout(hlayout);
 	vlayout->addStretch();
@@ -48,7 +48,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 
 	//connect(alternativesBox, &QComboBox::activated,
 		//	this, &TranslationDialog::alternativeChoosen);
-	connect(alternativesBox, SIGNAL(activated(int)),
+	connect(mAlternativesBox, SIGNAL(activated(int)),
 			this, SLOT(alternativeChoosen(int)));
 	connect(okButton, &QPushButton::clicked,
 			this, &TranslationDialog::requestAfterWrongAlternativeChoosen);
@@ -90,9 +90,9 @@ void TranslationDialog::alternativeChoosen(int index) {
 		}
 	}
 	else {
-		alternativesBox->setCurrentIndex(mnComboboxCorrectAlternativeIndex);
+		mAlternativesBox->setCurrentIndex(mnComboboxCorrectAlternativeIndex);
 		//alternativesBox->setCurrentIndex(-1);
-		alternativesBox->setEnabled(false);
+		mAlternativesBox->setEnabled(false);
 		okButton->setEnabled(true);
 	}
 }
@@ -132,8 +132,8 @@ bool TranslationDialog::prepareTranslationRequest()
 	requestLabel->setText(mRequestTrItem->isInvert()?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr());
 
 	// Заполняем combo box альтернативами прав перевода выражения
-	if (alternativesBox->count() >0)
-		alternativesBox->clear();
+	if (mAlternativesBox->count() >0)
+		mAlternativesBox->clear();
 	QString altText="";
 	// формируем список возможных ответов без правильного ответа
 	QStringList answerAlternatives;
@@ -166,11 +166,11 @@ bool TranslationDialog::prepareTranslationRequest()
 			answerAlternatives.removeAt(altIndex); // удаляем, чтобы он больше не выбирался
 		}
 
-		alternativesBox->insertItem(ind, altText);
+		mAlternativesBox->insertItem(ind, altText);
 		++ind;
 	}
-	alternativesBox->setEnabled(true);
-	alternativesBox->setCurrentIndex(-1);
+	mAlternativesBox->setEnabled(true);
+	mAlternativesBox->setCurrentIndex(-1);
 	okButton->setEnabled(false);
 
 	return true;

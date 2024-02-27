@@ -44,6 +44,7 @@ private slots:
 	void startTranslationDialog();
 	void menuAboutToShow();
 	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+	void sessionDialogAlternativesBoxActivated(int);
 	void applicationQuit();
 	void newDictionary();
 	void openFile();
