@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 			this, SLOT(removeTranslation(const TranslationItem *)));
 	connect(dictEditDialog, SIGNAL(editTranslationSig(const TranslationItem *)),
 			this, SLOT(editTranslation(const TranslationItem *)));
+
 	connect(ui->dictionaryNewAction, &QAction::triggered,
 			this, &MainWindow::newDictionary);
 	connect(ui->dictionaryOpenAction, &QAction::triggered,
@@ -125,6 +126,10 @@ MainWindow::MainWindow(QWidget *parent)
 	moveTranslationsDialog->setWindowModified(false);
 	dictEditDialog->setupTable(trItemsL);
 	dictEditDialog->setWindowModified(false);
+
+	/*int wdt = 350;
+	int hgt = 450;
+	dictEditDialog->setGeometry(x(), y(), wdt, hgt);*/
 
 	createActions();
 	createTrayIcon();

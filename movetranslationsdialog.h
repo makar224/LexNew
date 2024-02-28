@@ -28,7 +28,8 @@ protected slots:
 	void changeDirection();
 	void moveTranslation();
 	void restoreAllTranslations();
-
+protected:
+	void resizeEvent(QResizeEvent *) override;
 private:
 	void setTableItemRow(QTableWidget *widg, int row, const TranslationItem *tip);
 	bool setupTableItemRow(QTableWidget *widg, int row, const TranslationItem *tip);

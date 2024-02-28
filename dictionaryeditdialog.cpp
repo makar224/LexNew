@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QHeaderView>
 
 
 DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
@@ -24,17 +25,21 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	//expr1Edit->setMinimumWidth(tableWidget->columnWidth(0));
 	//expr2Edit->setMinimumWidth(tableWidget->columnWidth(1));
 	QHBoxLayout *hboxlayout1 = new QHBoxLayout;
-	hboxlayout1->addWidget(expr1Edit);
-	hboxlayout1->addWidget(expr2Edit);
-	//hboxlayout2->addStretch();
+	hboxlayout1->addStretch();
 	hboxlayout1->addWidget(addButton);
 	hboxlayout1->addWidget(removeButton);
+	QHBoxLayout *hboxlayout2 = new QHBoxLayout;
+	hboxlayout2->addStretch();
+	hboxlayout2->addWidget(expr1Edit);
+	hboxlayout2->addWidget(expr2Edit);
 	QHBoxLayout *hboxlayout3 = new QHBoxLayout;
 	hboxlayout3->addStretch();
 	hboxlayout3->addWidget(closeButton);
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->addLayout(hboxlayout1);
+	layout->addLayout(hboxlayout2);
 	layout->addWidget(tableWidget);
+	layout->addSpacing(10);
 	layout->addLayout(hboxlayout3);
 	setLayout(layout);
 
@@ -42,8 +47,8 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	setMinimumWidth(tableWidget->width() + 20);
 	//setMinimumHeight(tableWidget->height() + addButton->height() + closeButton->height() + 50);
 	setMinimumHeight(tableWidget->height() + closeButton->height() + 40);
-	int wdt = 320;
-	int hgt = 400;
+	int wdt = 350;
+	int hgt = 450;
 	setGeometry( (screenRect.width()-wdt)/2, (screenRect.height()-hgt)/2, wdt, hgt);
 
 	tableWidget->installEventFilter(this);
@@ -59,6 +64,14 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	//		this, SLOT(addTranslation));
 	connect(removeButton, &QPushButton::clicked,
 			this, &DictionaryEditDialog::removeTranslation);
+}
+void DictionaryEditDialog::resizeEvent(QResizeEvent *e) {
+	int linewdt = tableWidget->width()/2-tableWidget->verticalHeader()->width()/2-2;
+	tableWidget->setColumnWidth(0, linewdt);
+	tableWidget->setColumnWidth(1, linewdt);
+	expr1Edit->setMinimumWidth(linewdt-1);
+	expr2Edit->setMinimumWidth(linewdt-1);
+	QDialog::resizeEvent(e);
 }
 bool DictionaryEditDialog::eventFilter(QObject *obj, QEvent *event) {
 	if (obj == tableWidget)
@@ -174,6 +187,7 @@ bool DictionaryEditDialog::setupTableItemRow(int row, const TranslationItem *tip
 	if (tableWidget->rowCount()<row)
 		return false;
 
+	tableWidget->setRowHeight(row, 25);
 	tableWidget->setSortingEnabled(false);
 	tableWidget->setItem(row, 0, new QTableWidgetItem( tip->firstExpr() ));
 	tableWidget->setItem(row, 1, new QTableWidgetItem( tip->secondExpr() ));

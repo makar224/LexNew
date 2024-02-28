@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QHeaderView>
 
 
 MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
@@ -48,6 +49,7 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->addLayout(hboxlayout);
+	layout->addSpacing(10);
 	layout->addLayout(hboxlayout1);
 
 	setLayout(layout);
@@ -56,8 +58,8 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
 	setMinimumWidth(2*currentTableWidget->width() + changeDirButton->width() + 40);
 	setMinimumHeight(currentTableWidget->height() + closeButton->height() + 30);
-	int wdt = 640;
-	int hgt = 400;
+	int wdt = 680;
+	int hgt = 450;
 	setGeometry( (screenRect.width()-wdt)/2, (screenRect.height()-hgt)/2, wdt, hgt);
 
 	connect(closeButton, &QPushButton::clicked,
@@ -76,6 +78,15 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 			this, &MoveTranslationsDialog::restoreAllTranslations);
 }
 MoveTranslationsDialog::~MoveTranslationsDialog() {
+}
+void MoveTranslationsDialog::resizeEvent(QResizeEvent *e) {
+	int wdt = currentTableWidget->width();
+	int cwdt = (wdt-currentTableWidget->columnWidth(2))/2 - currentTableWidget->verticalHeader()->width()/2	-2;
+	currentTableWidget->setColumnWidth(0, cwdt);
+	currentTableWidget->setColumnWidth(1, cwdt);
+	exclusionTableWidget->setColumnWidth(0, cwdt);
+	exclusionTableWidget->setColumnWidth(1, cwdt);
+	QDialog::resizeEvent(e);
 }
 void MoveTranslationsDialog::tableItemSelectionChanged()
 {
@@ -324,6 +335,7 @@ bool MoveTranslationsDialog::setupTableItemRow(QTableWidget *widg, int row, cons
 	//if (widg->rowCount()<row)
 	//	return false;
 	widg->insertRow(row);
+	widg->setRowHeight(row, 25);
 	widg->setSortingEnabled(false);
 	QTableWidgetItem *item = nullptr;
 	bool inv = tip->isInvert();

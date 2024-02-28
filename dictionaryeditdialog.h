@@ -17,6 +17,7 @@ public:
 	void setupTable(const QList<TranslationItem*> &l);
 protected:
 	bool eventFilter(QObject *, QEvent *) override;
+	void resizeEvent(QResizeEvent *) override;
 protected slots:
 	void tableItemSelectionChanged();
 	void addTranslation();

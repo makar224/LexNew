@@ -32,17 +32,19 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	closeButton->setText(tr("Закрыть"));
 	closeButton->setMaximumWidth(80);
 	QVBoxLayout *vlayout = new QVBoxLayout;
-	vlayout->setSpacing(10);
+	//vlayout->setSpacing(10);
 	vlayout->addWidget(requestLabel);
+	vlayout->addSpacing(10);
 	QHBoxLayout *hlayout = new QHBoxLayout;
 	hlayout->addWidget(mAlternativesBox);
+	hlayout->addSpacing(10);
 	hlayout->addWidget(okButton);
 	vlayout->addLayout(hlayout);
-	vlayout->addStretch();
+	vlayout->addSpacing(closeButton->height());
 	vlayout->addWidget(closeButton, 0, Qt::AlignRight);
 	setLayout(vlayout);
 	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
-	int wdt = 300;
+	int wdt = 320;
 	int hgt = sizeHint().height();
 	setGeometry( (screenRect.width()-wdt)/2, (screenRect.height()-hgt)/2, wdt, hgt);
 
