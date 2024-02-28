@@ -22,7 +22,6 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	requestLabel = new QLabel(this);
 	mAlternativesBox = new QComboBox(this);
 	mAlternativesBox->setEditable(false);
-	//alternativesBox->setDuplicatesEnabled(false); // запрещение добавлять из edit одинаковые строки (-пользователем-не программно)
 	closeButton = new QPushButton(this);
 	connect(closeButton, &QPushButton::clicked,
 			this, &QWidget::close);
@@ -55,13 +54,6 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	connect(okButton, &QPushButton::clicked,
 			this, &TranslationDialog::requestAfterWrongAlternativeChoosen);
 }
-/*void TranslationDialog::closeEvent(QCloseEvent *e) {
-	mRequestTrItem = nullptr;
-	nTriesCounter = 0;
-	mComboboxCorrectAlternativeIndex = -1;
-	//QDialog::closeEvent(e);
-	QWidget::closeEvent(e);
-}*/
 void TranslationDialog::requestAfterWrongAlternativeChoosen() {
 	if (nTriesCounter >= nTries) {
 		nTriesCounter = 0;

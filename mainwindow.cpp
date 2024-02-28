@@ -21,12 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 	QCoreApplication::setOrganizationName("MyCompany");
 	QCoreApplication::setApplicationName("LexNew");
 
-	/*trItemsL.append(new TranslationItem(tr("to interfere with"), tr("мешать кому-л, чему-л")));
-	trItemsL.append(new TranslationItem(tr("to rely on(upon)"), tr("полагаться на")));
-	trItemsL.append(new TranslationItem(tr("to insist on"), tr("настаивать на")));
-	trItemsL.append(new TranslationItem(tr("to arrive at"), tr("прибывать в"), true, true));
-	trItemsL.append(new TranslationItem(tr("to open with"), tr("открывать чем-н."), true, false));*/
-
 	ui->setupUi(this);
 
 	moveTranslationsDialog = new MoveTranslationsDialog;
@@ -126,10 +120,6 @@ MainWindow::MainWindow(QWidget *parent)
 	moveTranslationsDialog->setWindowModified(false);
 	dictEditDialog->setupTable(trItemsL);
 	dictEditDialog->setWindowModified(false);
-
-	/*int wdt = 350;
-	int hgt = 450;
-	dictEditDialog->setGeometry(x(), y(), wdt, hgt);*/
 
 	createActions();
 	createTrayIcon();
