@@ -46,6 +46,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	int wdt = 320;
 	int hgt = sizeHint().height();
 	setGeometry( (screenRect.width()-wdt)/2, (screenRect.height()-hgt)/2, wdt, hgt);
+	setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
 	//connect(alternativesBox, &QComboBox::activated,
 		//	this, &TranslationDialog::alternativeChoosen);
