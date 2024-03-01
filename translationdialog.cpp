@@ -85,6 +85,7 @@ void TranslationDialog::alternativeChoosen(int index) {
 		}
 	}
 	else {
+		mRequestTrItem->resetSuccessCounter();
 		mAlternativesBox->setCurrentIndex(mnComboboxCorrectAlternativeIndex);
 		//alternativesBox->setCurrentIndex(-1);
 		mAlternativesBox->setEnabled(false);

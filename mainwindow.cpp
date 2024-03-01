@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
 			this, SLOT(removeTranslation(const TranslationItem *)));
 	connect(dictEditDialog, SIGNAL(editTranslationSig(const TranslationItem *)),
 			this, SLOT(editTranslation(const TranslationItem *)));
+	connect(dictEditDialog->saveButton, &QPushButton::clicked,
+			this, &MainWindow::saveFile);
 
 	connect(ui->dictionaryNewAction, &QAction::triggered,
 			this, &MainWindow::newDictionary);
@@ -192,6 +194,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			dictEditDialog->setWindowTitle(tr("%1%2 - %3").arg(shownName)
 										   .arg(dictEditDialog->isWindowModified()?"[*]":"")
 										   .arg("Edit"));
+			dictEditDialog->saveButton->setEnabled(dictEditDialog->isWindowModified());
 		}
 	}
 

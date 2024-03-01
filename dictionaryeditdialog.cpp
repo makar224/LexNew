@@ -17,13 +17,11 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	tableWidget->setSortingEnabled(true);
 	addButton = new QPushButton("+", this);
 	removeButton = new QPushButton("-", this);
-	closeButton = new QPushButton("Закрыть", this);
+	saveButton = new QPushButton(tr("Сохранить"), this);
+	closeButton = new QPushButton(tr("Закрыть"), this);
 	expr1Edit = new QLineEdit(this);
 	expr2Edit = new QLineEdit(this);
 
-	//expr1Edit->setSize
-	//expr1Edit->setMinimumWidth(tableWidget->columnWidth(0));
-	//expr2Edit->setMinimumWidth(tableWidget->columnWidth(1));
 	QHBoxLayout *hboxlayout1 = new QHBoxLayout;
 	hboxlayout1->addStretch();
 	hboxlayout1->addWidget(addButton);
@@ -33,6 +31,7 @@ DictionaryEditDialog::DictionaryEditDialog(QWidget *parent) :
 	hboxlayout2->addWidget(expr1Edit);
 	hboxlayout2->addWidget(expr2Edit);
 	QHBoxLayout *hboxlayout3 = new QHBoxLayout;
+	hboxlayout3->addWidget(saveButton);
 	hboxlayout3->addStretch();
 	hboxlayout3->addWidget(closeButton);
 	QVBoxLayout *layout = new QVBoxLayout;

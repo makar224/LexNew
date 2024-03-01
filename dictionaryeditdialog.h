@@ -31,6 +31,9 @@ private:
 	bool setupTableItemRow(int row, const TranslationItem *tip);
 	TranslationItem *getRowTIFromData(int row) const;
 
+public:
+	QPushButton *saveButton;
+private:
 	QTableWidget *tableWidget;
 	QPushButton *addButton;
 	QPushButton *removeButton;
