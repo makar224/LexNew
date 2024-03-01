@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
 	else
 		restoreGeometry(geometry);
 	settings.endGroup();
+	setFixedSize(width(), height());
 
 	mDictionaryFilePath = settings.value("dictionaryFilePath", "").toString();
 	// Устанавливаем в диалоге переводов исходные значения
@@ -167,6 +168,21 @@ bool MainWindow::event(QEvent *e) {
 		restoreTranslationSettings();
 		sessionStartTimer->stop();
 	}
+	else if (e->type() == QEvent::UpdateRequest) {
+		int nExcluded=0;
+		foreach(TranslationItem *tip, trItemsL) {
+			if (tip->isExcluded())
+				++nExcluded;
+		}
+		QString shownName = "";
+		if (!mDictionaryFilePath.isEmpty())
+			shownName = QFileInfo(mDictionaryFilePath).fileName();
+		ui->statusbar->showMessage(tr("%1%2 переводов, %3 активно, %4 иключено.").
+								   arg(shownName+(shownName.isEmpty()?"":": ")).
+								   arg(trItemsL.count()).
+								   arg(trItemsL.count()-nExcluded).
+								   arg(nExcluded));
+	}
 
 
 	return QMainWindow::event(e);
@@ -191,9 +207,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			QString shownName = "Untitled";
 			if (!mDictionaryFilePath.isEmpty())
 				shownName = QFileInfo(mDictionaryFilePath).fileName();
-			dictEditDialog->setWindowTitle(tr("%1%2 - %3").arg(shownName)
-										   .arg(dictEditDialog->isWindowModified()?"[*]":"")
-										   .arg("Edit"));
+			dictEditDialog->setWindowTitle(tr("%1%2 - %3").arg(shownName).
+										   arg(dictEditDialog->isWindowModified()?"[*]":"").
+										   arg("Edit"));
 			dictEditDialog->saveButton->setEnabled(dictEditDialog->isWindowModified());
 		}
 	}
