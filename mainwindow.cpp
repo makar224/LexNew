@@ -89,13 +89,18 @@ MainWindow::MainWindow(QWidget *parent)
 	if (!mDictionaryFilePath.isEmpty()) {
 		if (! loadDictionary(mDictionaryFilePath)) {
 			QMessageBox::critical(nullptr, tr("Application loading"),
-								 tr("Failed to load dictionary."));
+								 tr("Failed to load the dictionary."));
 		}
 		if (! loadMemoData()) {
-			ifstream is("default.txt", ios::in);
-			if (is) // файл открыт для чтения, значит он сущетсвует
-				QMessageBox::warning(nullptr, tr("Application loading"),
-									 tr("Failed to load memorizing data."));
+			// Было: если файл открыт для чтения, значит он сущетсвует и это ошибка конвертации, только тогда выводится сообщение
+			// А что, если он не открыт для чтения? Его нет или он поврежден. Сообщение не выводится?
+			// Сообщение выводится, если ошибка конвертации файла default.txt
+			// (или не удалось открыть файл, в том числе, если он не был найден или поврежден).
+			// Раз путь к словарю не пустой, значит словарь открывался, и данные
+			// при последнем выходе должны были сохраниться в файл default.txt, и он должен был существовать.
+			// Раз его нет, значит выводится сообщение
+			QMessageBox::warning(nullptr, tr("Application loading"),
+								 tr("Failed to load memorizing data."));
 		}
 	}
 
