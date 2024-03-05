@@ -20,6 +20,12 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
 	requestLabel = new QLabel(this);
+	requestLabel->setAlignment(Qt::AlignCenter);
+	requestLabel->setStyleSheet("background-color: yellow;"
+								//"font-weight: bold; font-size: 13px;"
+								"font-size: 14px;"
+								"border-style: solid; border-width: 2px; border-color: black;");
+	//requestLabel->setFrameStyle(QFrame::Box|QFrame::Plain);
 	mAlternativesBox = new QComboBox(this);
 	mAlternativesBox->setEditable(false);
 	closeButton = new QPushButton(this);
@@ -31,9 +37,9 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	closeButton->setText(tr("Закрыть"));
 	closeButton->setMaximumWidth(80);
 	QVBoxLayout *vlayout = new QVBoxLayout;
-	//vlayout->setSpacing(10);
+	vlayout->setSpacing(0);
 	vlayout->addWidget(requestLabel);
-	vlayout->addSpacing(10);
+	//vlayout->addSpacing(10);
 	QHBoxLayout *hlayout = new QHBoxLayout;
 	hlayout->addWidget(mAlternativesBox);
 	hlayout->addSpacing(10);
@@ -54,6 +60,10 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 			this, SLOT(alternativeChoosen(int)));
 	connect(okButton, &QPushButton::clicked,
 			this, &TranslationDialog::requestAfterWrongAlternativeChoosen);
+}
+void TranslationDialog::resizeEvent(QResizeEvent *e) {
+	requestLabel->setFixedSize(mAlternativesBox->width(), 40);
+	QWidget::resizeEvent(e);
 }
 void TranslationDialog::requestAfterWrongAlternativeChoosen() {
 	if (nTriesCounter >= nTries) {

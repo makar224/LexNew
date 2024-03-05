@@ -28,7 +28,8 @@ public:
 	void setTriesNumber(int num) { nTries = num; }
 
 	bool prepareTranslationRequest();
-
+protected:
+	void resizeEvent(QResizeEvent *) override;
 protected slots:
 	void alternativeChoosen(int index);
 	void requestAfterWrongAlternativeChoosen();

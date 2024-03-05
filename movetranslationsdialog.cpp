@@ -21,8 +21,11 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	exclusionTableWidget->resizeColumnToContents(2);
 	exclusionTableWidget->setSortingEnabled(true);
 	moveButton = new QPushButton("<>", this);
-	changeDirButton = new QPushButton("Перевернуть", this);
-	closeButton = new QPushButton("Закрыть", this);
+	moveButton->setToolTip(tr("Включить/исключить"));
+	changeDirButton = new QPushButton(tr("Поменять\nнаправление"), this);
+	changeDirButton->setToolTip(tr("Поменять направление перевода"));
+	changeDirButton->setFixedSize(100, 50);
+	closeButton = new QPushButton(tr("Закрыть"), this);
 	restoreAllButton = new QPushButton(tr("<<"), this);
 	restoreAllButton->setToolTip(tr("Восстановить все"));
 
