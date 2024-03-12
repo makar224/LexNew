@@ -265,8 +265,8 @@ void MainWindow::createTrayIcon() {
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setContextMenu(trayIconMenu);
 
-	trayIcon->setIcon(QIcon(":/images/heart.png"));
-	setWindowIcon(QIcon(":/images/heart.png"));
+	trayIcon->setIcon(QIcon(":/images/Lex.png"));
+	setWindowIcon(QIcon(":/images/Lex.png"));
 }
 void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
 	switch (reason) {
@@ -424,13 +424,14 @@ bool MainWindow::loadMemoData() {
 	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
 	if (!ifs)
 		return false;
+
 	bool b = false;
 	int n = 0;
 	foreach(TranslationItem *tip, trItemsL) {
 		if (ifs.eof())
 			return false;
 		ifs >> std::boolalpha >> b;
-		if (ifs.fail()  || ifs.eof())
+		if (ifs.fail() || ifs.eof())
 			return false;
 		tip->setExcluded(b);
 		ifs >> std::boolalpha >> b;
