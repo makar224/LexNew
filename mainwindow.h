@@ -57,6 +57,7 @@ private:
 	bool saveDictionary(const QString& path);
 	bool loadMemoData();
 	bool saveMemoData() const;
+	bool removeMemoDataFile();
 	void setDictFilePath(const QString& path);
 	void clearTrItems();
     Ui::MainWindow *ui;

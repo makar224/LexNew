@@ -13,6 +13,7 @@ using namespace std;
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#define TEMP_DIRECTORY_PATH "/tmp/"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -265,14 +266,15 @@ void MainWindow::createTrayIcon() {
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setContextMenu(trayIconMenu);
 
-	trayIcon->setIcon(QIcon(":/images/Lex.png"));
-	setWindowIcon(QIcon(":/images/Lex.png"));
+	//trayIcon->setIcon(QIcon(":/images/Lex.png"));
+	//setWindowIcon(QIcon(":/images/Lex.png"));
 }
 void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
 	switch (reason) {
 	case QSystemTrayIcon::Trigger:
-		if (!sessionDialog->isVisible())
-			showNormal();
+		//if (!sessionDialog->isVisible())
+		showNormal();
+		trayIcon->setIcon(QGuiApplication::windowIcon());
 		break;
 	default:
 		;
@@ -331,7 +333,7 @@ void MainWindow::newDictionary() {
 	moveTranslationsDialog->clearTables();
 	mDictionaryFilePath.clear();
 	clearTrItems();
-	QFile("default.txt").remove();
+	removeMemoDataFile();
 	dictEditDialog->open();
 }
 void MainWindow::openFile() {
@@ -340,13 +342,26 @@ void MainWindow::openFile() {
 		QString filePath = QFileDialog::getOpenFileName(this, tr("Открытие файла словаря"), ".");
 		if (!filePath.isEmpty()) {
 			if (loadDictionary(filePath)) {
-				QFile("default.txt").remove();
+				removeMemoDataFile();
 				dictEditDialog->setupTable(trItemsL);
 				moveTranslationsDialog->setupTables(trItemsL);
 				dictEditDialog->open();
 			}
 		}
 	}
+}
+bool MainWindow::removeMemoDataFile() {
+#if defined (Q_OS_WIN32)
+	return QFile("default.txt").remove());
+#elif defined (Q_OS_LINUX)
+	if (!QFile(TEMP_DIRECTORY_PATH"default.txt").remove())
+		return false;
+	//if (!QDir(TEMP_DIRECTORY_PATH).rmdir("lexnew"))
+	//	return false;
+#else
+	return QFile("default.txt").remove();
+#endif
+	return true;
 }
 bool MainWindow::saveFile() {
 	if (!mDictionaryFilePath.isEmpty())	{
@@ -421,7 +436,18 @@ void MainWindow::setDictFilePath(const QString& path) {
 bool MainWindow::loadMemoData() {
 	if (trItemsL.isEmpty())
 		return true;
+
+#if defined (Q_OS_WIN32)
 	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
+#elif defined (Q_OS_LINUX)
+	QString dirpath = TEMP_DIRECTORY_PATH"lexnew";
+	//QDir dir(TEMP_DIRECTORY_NAME "lexnew");
+	if (!QDir(TEMP_DIRECTORY_PATH"lexnew").exists())
+		return false;
+	ifstream ifs(TEMP_DIRECTORY_PATH"lexnew/default.txt", ios::in);
+#else
+	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
+#endif
 	if (!ifs)
 		return false;
 
@@ -448,7 +474,19 @@ bool MainWindow::loadMemoData() {
 bool MainWindow::saveMemoData() const {
 	if (trItemsL.isEmpty())
 		return true;
+#if defined (Q_OS_WIN32)
 	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
+#elif defined (Q_OS_LINUX)
+	QDir dir(TEMP_DIRECTORY_PATH);
+	if (!dir.exists("lexnew")) {
+		if (!dir.mkdir("lexnew"//, 0x6066 //since Qt 6.3
+					   ))
+			return false;
+	}
+	ofstream ofs(TEMP_DIRECTORY_PATH"lexnew/default.txt", ios::out);
+#else
+	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
+#endif
 	if (!ofs)
 		return false;
 	foreach(const TranslationItem *tip, trItemsL) {
