@@ -39,7 +39,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	QVBoxLayout *vlayout = new QVBoxLayout;
 	vlayout->setSpacing(0);
 	vlayout->addWidget(requestLabel);
-	//vlayout->addSpacing(10);
+	vlayout->addSpacing(10);
 	QHBoxLayout *hlayout = new QHBoxLayout;
 	hlayout->addWidget(mAlternativesBox);
 	hlayout->addSpacing(10);
@@ -131,8 +131,12 @@ bool TranslationDialog::prepareTranslationRequest()
 		return false;
 	}
 	// формируем запрашиваемый перевод
-	int index = rand() % workTrItemsv.count();
+	int index = 0;
+	do { // исключаем повторение одного и того же запроса
+		index = rand() % workTrItemsv.count();
+	} while (workTrItemsv[index] == mRequestTrItem);
 	mRequestTrItem = workTrItemsv[index];
+
 	workTrItemsv.remove(index); // удаляем, чтобы он больше не выбирался во время выбора альтернатив
 	QString correctAnswer = mRequestTrItem->isInvert()?mRequestTrItem->firstExpr():mRequestTrItem->secondExpr();
 	requestLabel->setText(mRequestTrItem->isInvert()?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr());

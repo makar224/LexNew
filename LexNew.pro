@@ -37,7 +37,7 @@ FORMS += \
 #qnx: target.path = /tmp/$${TARGET}/bin
 #else: unix:!android: target.path = /opt/$${TARGET}/bin
 #!isEmpty(target.path): INSTALLS += target
-target.path = /home/artem/Qt/LexNew
+target.path = /home/artem/cpp/Qt/LexNew
 INSTALLS += target
 
 RESOURCES += \

@@ -130,6 +130,7 @@ void DictionaryEditDialog::addTranslation() {
 	expr2Edit->clear();
 	expr1Edit->setModified(false);
 	expr2Edit->setModified(false);
+    expr1Edit->setFocus();
 	int row = tableWidget->rowCount();
 	tableWidget->insertRow(row);
 	setupTableItemRow(row, tip);
