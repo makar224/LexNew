@@ -182,11 +182,11 @@ bool MainWindow::event(QEvent *e) {
 			if (tip->isExcluded())
 				++nExcluded;
 		}
-        QString shownName = "";
-		if (!mDictionaryFilePath.isEmpty())
-			shownName = QFileInfo(mDictionaryFilePath).fileName();
-		ui->statusbar->showMessage(tr("%1%2 переводов, %3 активно, %4 иключено.").
-								   arg(shownName+(shownName.isEmpty()?"":": ")).
+		//QString shownName = "";
+		//if (!mDictionaryFilePath.isEmpty())
+		//	shownName = QFileInfo(mDictionaryFilePath).fileName();
+		ui->statusbar->showMessage(tr("%1 переводов: %2 активно, %3 иключено.").
+								   //arg(shownName+(shownName.isEmpty()?"":": ")).
 								   arg(trItemsL.count()).
 								   arg(trItemsL.count()-nExcluded).
 								   arg(nExcluded));
@@ -230,14 +230,14 @@ void MainWindow::startTranslationDialog()
 {
 	if (qobject_cast<QTimer*>(QObject::sender()) == sessionStartTimer) {
 		sessionDialog->showNormal();
-        sessionDialog->setFocus();
+		sessionDialog->setFocus();
 		return;
 	}
 	else if (qobject_cast<QPushButton*>(QObject::sender()) == ui->startSessionButton)
 	{
 		// вызов по кнопке
 		sessionDialog->setWindowModality(Qt::WindowModal);
-        if (sessionDialog->prepareTranslationRequest())
+		if (sessionDialog->prepareTranslationRequest())
 			sessionDialog->showNormal();
 	}
 }
@@ -356,12 +356,12 @@ bool MainWindow::removeMemoDataFile() {
 #if defined (Q_OS_WIN32)
 	return QFile("default.txt").remove());
 #elif defined (Q_OS_LINUX)
-    QString baseDirPath;
-    char *home = getenv("HOME");
-    if (NULL != home)
-        baseDirPath = QString::fromLocal8Bit(home) + "/";
-    //QString baseDirPath = TEMP_DIRECTORY_PATH;
-    if (!QFile(baseDirPath+".lexnew/default.txt").remove())
+	QString baseDirPath;
+	char *home = getenv("HOME");
+	if (NULL != home)
+		baseDirPath = QString::fromLocal8Bit(home) + "/";
+	//QString baseDirPath = TEMP_DIRECTORY_PATH;
+	if (!QFile(baseDirPath+".lexnew/default.txt").remove())
 		return false;
 #else
 	return QFile("default.txt").remove();
@@ -445,15 +445,15 @@ bool MainWindow::loadMemoData() {
 #if defined (Q_OS_WIN32)
 	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
 #elif defined (Q_OS_LINUX)
-    QString baseDirPath;
-    char *home = getenv("HOME");
-    if (NULL != home)
-        baseDirPath = QString::fromLocal8Bit(home) + "/";
-    //QString baseDirPath = TEMP_DIRECTORY_PATH;
+	QString baseDirPath;
+	char *home = getenv("HOME");
+	if (NULL != home)
+		baseDirPath = QString::fromLocal8Bit(home) + "/";
+	//QString baseDirPath = TEMP_DIRECTORY_PATH;
 	//QDir dir(baseDirPath);
-    if (!QDir(baseDirPath).exists(".lexnew"))
+	if (!QDir(baseDirPath).exists(".lexnew"))
 		return false;
-    ifstream ifs(baseDirPath.toStdString()+".lexnew/default.txt", ios::in);
+	ifstream ifs(baseDirPath.toStdString()+".lexnew/default.txt", ios::in);
 #else
 	ifstream ifs("default.txt", ios::in); // вх поток на файл default.txt в тек директории
 #endif
@@ -486,18 +486,18 @@ bool MainWindow::saveMemoData() const {
 #if defined (Q_OS_WIN32)
 	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
 #elif defined (Q_OS_LINUX)
-    char *home = getenv("HOME");
-    QString baseDirPath;
-    if (NULL != home)
-        baseDirPath = QString::fromLocal8Bit(home) + "/";
-    //QString baseDirPath = TEMP_DIRECTORY_PATH;
+	char *home = getenv("HOME");
+	QString baseDirPath;
+	if (NULL != home)
+		baseDirPath = QString::fromLocal8Bit(home) + "/";
+	//QString baseDirPath = TEMP_DIRECTORY_PATH;
 	QDir dir(baseDirPath);
-    if (!dir.exists(".lexnew")) {
-        if (!dir.mkdir(".lexnew"//, 0x6066 //since Qt 6.3
+	if (!dir.exists(".lexnew")) {
+		if (!dir.mkdir(".lexnew"//, 0x6066 //since Qt 6.3
 					   ))
 			return false;
 	}
-    ofstream ofs(baseDirPath.toStdString() + ".lexnew/default.txt", ios::out);
+	ofstream ofs(baseDirPath.toStdString() + ".lexnew/default.txt", ios::out);
 #else
 	ofstream ofs("default.txt", ios::out); // вых поток на файл default.txt в тек директории
 #endif
