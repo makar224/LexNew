@@ -11,20 +11,17 @@
 MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	QDialog(parent)
 {
-	QStringList headerLabels = {tr("Выражение"), tr("Перевод"), tr("Напр.")};
-	currentTableWidget = new QTableWidget(0, 3, this);
+	QStringList headerLabels = {tr("Выражение"), tr("Перевод")};
+	currentTableWidget = new QTableWidget(0, 2, this);
 	currentTableWidget->setHorizontalHeaderLabels(headerLabels);
-	currentTableWidget->resizeColumnToContents(2);
+	//currentTableWidget->resizeColumnToContents(2);
 	currentTableWidget->setSortingEnabled(true);
-	exclusionTableWidget = new QTableWidget(0, 3, this);
+	exclusionTableWidget = new QTableWidget(0, 2, this);
 	exclusionTableWidget->setHorizontalHeaderLabels(headerLabels);
-	exclusionTableWidget->resizeColumnToContents(2);
+	//exclusionTableWidget->resizeColumnToContents(2);
 	exclusionTableWidget->setSortingEnabled(true);
 	moveButton = new QPushButton("<>", this);
 	moveButton->setToolTip(tr("Включить/исключить"));
-	changeDirButton = new QPushButton(tr("Поменять\nнаправление"), this);
-	changeDirButton->setToolTip(tr("Поменять направление перевода"));
-	changeDirButton->setFixedSize(100, 50);
 	closeButton = new QPushButton(tr("Закрыть"), this);
 	restoreAllButton = new QPushButton(tr("<<"), this);
 	restoreAllButton->setToolTip(tr("Восстановить все"));
@@ -35,7 +32,6 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	QVBoxLayout *vboxlayout2 = new QVBoxLayout;
 	vboxlayout2->addStretch();
 	vboxlayout2->addWidget(moveButton);
-	vboxlayout2->addWidget(changeDirButton);
 	vboxlayout2->addStretch();
 	vboxlayout2->addWidget(restoreAllButton);
 	QVBoxLayout *vboxlayout3 = new QVBoxLayout;
@@ -59,7 +55,7 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	//QScreen *screen = QApplication::screens.at(0);
 	//QScreen* screen = QGuiApplication::screens().begin();
 	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
-	setMinimumWidth(2*currentTableWidget->width() + changeDirButton->width() + 40);
+	setMinimumWidth(2*currentTableWidget->width() + moveButton->width() + 40);
 	setMinimumHeight(currentTableWidget->height() + closeButton->height() + 30);
 	int wdt = 680;
 	int hgt = 450;
@@ -73,8 +69,6 @@ MoveTranslationsDialog::MoveTranslationsDialog(QWidget *parent):
 	connect(exclusionTableWidget, &QTableWidget::itemSelectionChanged,
 			this, &MoveTranslationsDialog::tableItemSelectionChanged);
 
-	connect(changeDirButton, &QPushButton::clicked,
-			this, &MoveTranslationsDialog::changeDirection);
 	connect(moveButton, &QPushButton::clicked,
 			this, &MoveTranslationsDialog::moveTranslation);
 	connect(restoreAllButton, &QPushButton::clicked,
@@ -146,23 +140,6 @@ void MoveTranslationsDialog::tableItemSelectionChanged()
 	recursion = false;
 }
 
-void MoveTranslationsDialog::changeDirection()
-{
-	QTableWidget *widg = nullptr;
-	if (! currentTableWidget->selectedItems().isEmpty())
-		widg = currentTableWidget;
-	else if (! exclusionTableWidget->selectedItems().isEmpty())
-		widg = exclusionTableWidget;
-	else return;
-
-	int sldRow = widg->currentRow();
-	TranslationItem *rowtip = getRowTIFromData(widg, sldRow);
-	if (nullptr == rowtip)
-		return;
-	rowtip->setInvert(rowtip->isInvert()?false:true);
-	setTableItemRow(widg, sldRow, rowtip);
-	//setWindowModified(true); // поля в строке меняются местами - флаг модификации долджен поддерживаться атвтоматически
-}
 void MoveTranslationsDialog::moveTranslation()
 {
 	QTableWidget *widg = nullptr, *contrWidg = nullptr;
@@ -206,21 +183,15 @@ void MoveTranslationsDialog::restoreAllTranslations() {
 		rowtip->setExcluded(false);
 		rowtip->resetSuccessCounter();
 		currentTableWidget->insertRow(row1);
-		bool inv = rowtip->isInvert();
 		item = new QTableWidgetItem();
 		Qt::ItemFlags flags = (item->flags() & ~Qt::ItemIsEditable);
 		item->setFlags(flags);
-		item->setText(inv?rowtip->secondExpr():rowtip->firstExpr());
+		item->setText(rowtip->firstExpr());
 		currentTableWidget->setItem(row1, 0, item);
 		item = new QTableWidgetItem();
 		item->setFlags(flags);
-		item->setText(inv?rowtip->firstExpr():rowtip->secondExpr());
+		item->setText(rowtip->secondExpr());
 		currentTableWidget->setItem(row1, 1, item);
-		item = new QTableWidgetItem();
-		item->setFlags(flags);
-		item->setTextAlignment(Qt::AlignHCenter);
-		item->setText(inv?"<--":"-->");
-		currentTableWidget->setItem(row1, 2, item);
 		setRowTIData(currentTableWidget, row1, rowtip);
 	}
 	currentTableWidget->setSortingEnabled(true);
@@ -319,16 +290,8 @@ void MoveTranslationsDialog::clearTables() {
 void MoveTranslationsDialog::setTableItemRow(QTableWidget *w, int row, const TranslationItem *tip) {
 	Q_ASSERT(w->rowCount() >= row);
 	w->setSortingEnabled(false);
-	if (!tip->isInvert()) {
-		w->item(row, 0)->setText(tip->firstExpr());
-		w->item(row,1)->setText(tip->secondExpr());
-		w->item(row, 2)->setText("-->");
-	}
-	else {
-		w->item(row, 0)->setText(tip->secondExpr());
-		w->item(row,1)->setText(tip->firstExpr());
-		w->item(row, 2)->setText("<--");
-	}
+	w->item(row, 0)->setText(tip->firstExpr());
+	w->item(row, 1)->setText(tip->secondExpr());
 	w->setSortingEnabled(true);
 }
 // с нуля создание и заполнение нового ряда
@@ -341,21 +304,15 @@ bool MoveTranslationsDialog::setupTableItemRow(QTableWidget *widg, int row, cons
 	widg->setRowHeight(row, 25);
 	widg->setSortingEnabled(false);
 	QTableWidgetItem *item = nullptr;
-	bool inv = tip->isInvert();
 	item = new QTableWidgetItem();
 	Qt::ItemFlags flags = (item->flags() & ~Qt::ItemIsEditable);
 	item->setFlags(flags);
-	item->setText(inv?tip->secondExpr():tip->firstExpr());
+	item->setText(tip->firstExpr());
 	widg->setItem(row, 0, item);
 	item = new QTableWidgetItem();
 	item->setFlags(flags);
-	item->setText(inv?tip->firstExpr():tip->secondExpr());
+	item->setText(tip->secondExpr());
 	widg->setItem(row, 1, item);
-	item = new QTableWidgetItem();
-	item->setFlags(flags);
-	item->setTextAlignment(Qt::AlignHCenter);
-	item->setText(inv?"<--":"-->");
-	widg->setItem(row, 2, item);
 
 	setRowTIData(widg, row, tip);
 	widg->setSortingEnabled(true);

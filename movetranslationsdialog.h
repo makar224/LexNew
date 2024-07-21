@@ -25,7 +25,6 @@ public slots:
 	void excludeTranslation(TranslationItem *tip);
 protected slots:
 	void tableItemSelectionChanged();
-	void changeDirection();
 	void moveTranslation();
 	void restoreAllTranslations();
 protected:
@@ -39,7 +38,6 @@ private:
 	QTableWidget *currentTableWidget;
 	QTableWidget *exclusionTableWidget;
 	QPushButton *moveButton;
-	QPushButton *changeDirButton;
 	QPushButton *restoreAllButton;
 	QPushButton *closeButton;
 };

@@ -20,11 +20,19 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
 	requestLabel = new QLabel(this);
-	requestLabel->setAlignment(Qt::AlignCenter);
-	requestLabel->setStyleSheet("background-color: yellow;"
+	//requestLabel->setAlignment(Qt::AlignCenter);
+	requestLabel->setStyleSheet("QLabel {"
+								"background-color: yellow;"
 								//"font-weight: bold; font-size: 13px;"
 								"font-size: 14px;"
-								"border-style: solid; border-width: 2px; border-color: black;");
+								"border-style: solid; border-width: 2px; border-color: black;"
+								"}"
+								"QToolTip {"
+								"background-color: black;"
+								"font-size: 14px;"
+								"font-color: white;"
+								"}"
+								);
 	//requestLabel->setFrameStyle(QFrame::Box|QFrame::Plain);
 	mAlternativesBox = new QComboBox(this);
 	mAlternativesBox->setEditable(false);
@@ -53,6 +61,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	int hgt = sizeHint().height();
 	setGeometry( (screenRect.width()-wdt)/2, (screenRect.height()-hgt)/2, wdt, hgt);
 	setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	setWindowTitle(tr("Переводы"));
 
 	//connect(alternativesBox, &QComboBox::activated,
 		//	this, &TranslationDialog::alternativeChoosen);
@@ -138,8 +147,12 @@ bool TranslationDialog::prepareTranslationRequest()
 	mRequestTrItem = workTrItemsv[index];
 
 	workTrItemsv.remove(index); // удаляем, чтобы он больше не выбирался во время выбора альтернатив
-	QString correctAnswer = mRequestTrItem->isInvert()?mRequestTrItem->firstExpr():mRequestTrItem->secondExpr();
-	requestLabel->setText(mRequestTrItem->isInvert()?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr());
+	bool trdir = (bool)(rand() % 2); // задаем направление переводов
+
+	QString correctAnswer = trdir?mRequestTrItem->firstExpr():mRequestTrItem->secondExpr();
+	QString requestText = trdir?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr();
+	requestLabel->setText(requestText);
+	requestLabel->setToolTip(requestText);
 
 	// Заполняем combo box альтернативами прав перевода выражения
 	if (mAlternativesBox->count() >0)
@@ -148,7 +161,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	// формируем список возможных ответов без правильного ответа
 	QStringList answerAlternatives;
 	for (const TranslationItem *tip: workTrItemsv) {
-		altText = mRequestTrItem->isInvert()?tip->firstExpr():tip->secondExpr();
+		altText = trdir?tip->firstExpr():tip->secondExpr();
 		if (altText != correctAnswer)
 			answerAlternatives << altText;
 	}

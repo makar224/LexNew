@@ -5,11 +5,10 @@ using std::string;
 using std::ios;
 #include "translationmodel.h"
 
-TranslationItem::TranslationItem():invert(false), excluded(false) {}
+TranslationItem::TranslationItem():excluded(false) {}
 
-TranslationItem::TranslationItem(const QString &expr1, const QString &expr2, bool excl, bool inv):
+TranslationItem::TranslationItem(const QString &expr1, const QString &expr2, bool excl):
 exprs(QPair<QString, QString>(expr1, expr2)),
-invert(inv),
 excluded(excl),
 nSuccessCounter(0)
 {}
@@ -21,7 +20,6 @@ istream& operator>>(istream& is, TranslationItem& ti) {
 	is.getline(exprA, 128); ti.exprs.first = QString::fromUtf8(exprA);
 	is.getline(exprA, 128); ti.exprs.second = QString::fromUtf8(exprA);
 	is >> std::boolalpha >> ti.excluded;
-	is >> std::boolalpha >> ti.invert;
 	is >> ti.nSuccessCounter;
 
 	return is;
@@ -30,7 +28,6 @@ ostream& operator<<(ostream& os, const TranslationItem& ti) {
 	os << ti.exprs.first.toStdString() << "\n"
 		<< ti.exprs.second.toStdString() << "\n"
 		<< std::boolalpha<<ti.excluded
-		<< std::boolalpha<<ti.invert
 		<< ti.nSuccessCounter;
 	return os;
 }

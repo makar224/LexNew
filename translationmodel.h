@@ -10,11 +10,9 @@ using std::ostream;
 class TranslationItem {
 public:
 	TranslationItem();
-	TranslationItem(const QString &expr1, const QString &expr2, bool excl=false, bool inv=false);
+	TranslationItem(const QString &expr1, const QString &expr2, bool excl=false);
 	int successCounter() const {return nSuccessCounter;}
-	void setInvert(bool b) {invert = b;}
 	void setExcluded(bool b) {excluded = b;}
-	bool isInvert() const {return invert;}
 	bool isExcluded() const {return excluded;}
 	void setSuccessCounter(int n) {nSuccessCounter=n;}
 	void setFirstExpr(const QString &str) {
@@ -33,7 +31,6 @@ public:
 
 private:
 	QPair<QString, QString> exprs;
-	bool invert;
 	bool excluded;
 	int nSuccessCounter;
 };

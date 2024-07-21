@@ -185,7 +185,7 @@ bool MainWindow::event(QEvent *e) {
 		//QString shownName = "";
 		//if (!mDictionaryFilePath.isEmpty())
 		//	shownName = QFileInfo(mDictionaryFilePath).fileName();
-		ui->statusbar->showMessage(tr("%1 переводов: %2 активно, %3 иключено.").
+		ui->statusbar->showMessage(tr("%1 переводов: %2 активно, %3 исключено.").
 								   //arg(shownName+(shownName.isEmpty()?"":": ")).
 								   arg(trItemsL.count()).
 								   arg(trItemsL.count()-nExcluded).
@@ -469,10 +469,6 @@ bool MainWindow::loadMemoData() {
 		if (ifs.fail() || ifs.eof())
 			return false;
 		tip->setExcluded(b);
-		ifs >> std::boolalpha >> b;
-		if (ifs.fail() || ifs.eof())
-			return false;
-		tip->setInvert(b);
 		ifs >> n;
 		if (ifs.fail())
 			return false;
@@ -505,9 +501,6 @@ bool MainWindow::saveMemoData() const {
 		return false;
 	foreach(const TranslationItem *tip, trItemsL) {
 		ofs << std::boolalpha << tip->isExcluded();
-		if (! ofs)
-			return false;
-		ofs << std::boolalpha << tip->isInvert();
 		if (! ofs)
 			return false;
 		ofs << tip->successCounter();
