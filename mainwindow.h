@@ -23,10 +23,11 @@ public:
     ~MainWindow();
 	
 	void setVisible(bool visible) override;
-	
+
 protected slots:
 	void applyTranslationSettings();
 	void restoreDefaultTranslationSettings();
+	void enableApplyButton();
 
 	void addTranslation(const TranslationItem *tip);
 	void removeTranslation(const TranslationItem *tip);

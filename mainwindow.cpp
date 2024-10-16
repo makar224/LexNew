@@ -18,13 +18,22 @@ using namespace std;
 //#endif
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+	: QMainWindow(parent)
+	, ui(new Ui::MainWindow)
 {
 	QCoreApplication::setOrganizationName("MyCompany");
 	QCoreApplication::setApplicationName("LexNew");
 
 	ui->setupUi(this);
+
+	connect(ui->sessionIntervalSpinBox, SIGNAL(textChanged(const QString&)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->triesSpinBox, SIGNAL(textChanged(const QString&)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->alternativesSpinBox, SIGNAL(textChanged(const QString&)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->successTriesSpinBox, SIGNAL(textChanged(const QString&)),
+			this, SLOT(enableApplyButton()));
 
 	moveTranslationsDialog = new MoveTranslationsDialog;
 	connect(ui->moveTranslationsButton, &QPushButton::clicked,
@@ -186,10 +195,10 @@ bool MainWindow::event(QEvent *e) {
 		//if (!mDictionaryFilePath.isEmpty())
 		//	shownName = QFileInfo(mDictionaryFilePath).fileName();
 		ui->statusbar->showMessage(tr("%1 переводов: %2 активно, %3 исключено.").
-								   //arg(shownName+(shownName.isEmpty()?"":": ")).
-								   arg(trItemsL.count()).
-								   arg(trItemsL.count()-nExcluded).
-								   arg(nExcluded));
+									//arg(shownName+(shownName.isEmpty()?"":": ")).
+									arg(trItemsL.count()).
+									arg(trItemsL.count()-nExcluded).
+									arg(nExcluded));
 	}
 
 
@@ -216,8 +225,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
 			if (!mDictionaryFilePath.isEmpty())
 				shownName = QFileInfo(mDictionaryFilePath).fileName();
 			dictEditDialog->setWindowTitle(tr("%1%2 - %3").arg(shownName).
-										   arg(dictEditDialog->isWindowModified()?"[*]":"").
-										   arg("Edit"));
+											arg(dictEditDialog->isWindowModified()?"[*]":"").
+											arg("Edit"));
 			dictEditDialog->saveButton->setEnabled(dictEditDialog->isWindowModified());
 		}
 	}
@@ -289,6 +298,7 @@ void MainWindow::setVisible(bool visible)
 {
 	minimizeAction->setEnabled(visible);
 	maximizeAction->setEnabled(!isMaximized());
+	bool maximized = isMaximized();
 	restoreAction->setEnabled(isMaximized() || !visible);
 	QMainWindow::setVisible(visible);
 }
@@ -298,13 +308,14 @@ void MainWindow::restoreDefaultTranslationSettings() {
 	ui->alternativesSpinBox->setValue(5);
 	ui->triesSpinBox->setValue(4);
 
-	applyTranslationSettings();
+	//applyTranslationSettings();
 }
 void MainWindow::applyTranslationSettings() {
 	sessionDialog->setSessionInterval(ui->sessionIntervalSpinBox->value());
 	sessionDialog->setSuccessesForExclusion(ui->successTriesSpinBox->value());
 	sessionDialog->setAlternativesNumber(ui->alternativesSpinBox->value());
 	sessionDialog->setTriesNumber(ui->triesSpinBox->value());
+	ui->applyButton->setDisabled(true);
 	if (sessionDialog->isVisible())
 		sessionDialog->prepareTranslationRequest();
 }
@@ -313,12 +324,16 @@ void MainWindow::restoreTranslationSettings() {
 	ui->successTriesSpinBox->setValue(sessionDialog->successesForExclusion());
 	ui->alternativesSpinBox->setValue(sessionDialog->alternativesNumber());
 	ui->triesSpinBox->setValue(sessionDialog->triesNumber());
+	ui->applyButton->setDisabled(true);
+}
+void MainWindow::enableApplyButton() {
+	ui->applyButton->setEnabled(true);
 }
 bool MainWindow::processUnsavedChanges() {
 	if (dictEditDialog->isWindowModified()) {
 		int r = QMessageBox::warning(this,
 									 tr("Edit"), tr("The dictionary has been modified.\n"
-														   "Do you want to save your changes?"),
+										"Do you want to save your changes?"),
 									 QMessageBox::Yes | QMessageBox::Default,
 									 QMessageBox::No,
 									 QMessageBox::Cancel | QMessageBox::Escape);
@@ -347,7 +362,7 @@ void MainWindow::openFile() {
 				removeMemoDataFile();
 				dictEditDialog->setupTable(trItemsL);
 				moveTranslationsDialog->setupTables(trItemsL);
-				dictEditDialog->open();
+				//dictEditDialog->open();
 			}
 		}
 	}
@@ -425,7 +440,7 @@ bool MainWindow::saveDictionary(const QString& path) {
 	foreach(const TranslationItem* tip, trItemsL) {
 		out << tip->firstExpr() + "/" + tip->secondExpr() + "\n";
 		if (out.status() != QTextStream::Ok) {
-			qDebug() << "Ошибка записи фпайла" + path;
+		qDebug() << "Ошибка записи файла" + path;
 			return false;
 		}
 	}
@@ -437,6 +452,8 @@ void MainWindow::setDictFilePath(const QString& path) {
 	mDictionaryFilePath = path;
 	dictEditDialog->setWindowModified(false);
 	moveTranslationsDialog->setWindowModified(false);
+	//QSettings settings;
+	//settings.setValue("dictionaryFilePath", mDictionaryFilePath);
 }
 bool MainWindow::loadMemoData() {
 	if (trItemsL.isEmpty())
@@ -490,7 +507,7 @@ bool MainWindow::saveMemoData() const {
 	QDir dir(baseDirPath);
 	if (!dir.exists(".lexnew")) {
 		if (!dir.mkdir(".lexnew"//, 0x6066 //since Qt 6.3
-					   ))
+						))
 			return false;
 	}
 	ofstream ofs(baseDirPath.toStdString() + ".lexnew/default.txt", ios::out);
@@ -533,7 +550,7 @@ void MainWindow::clearTrItems() {
 }
 MainWindow::~MainWindow()
 {
-    delete ui;
+	delete ui;
 	delete moveTranslationsDialog;
 	delete dictEditDialog;
 	delete sessionDialog;

@@ -20,7 +20,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
 	requestLabel = new QLabel(this);
-	//requestLabel->setAlignment(Qt::AlignCenter);
+	requestLabel->setAlignment(Qt::AlignCenter);
 	requestLabel->setStyleSheet("QLabel {"
 								"background-color: yellow;"
 								//"font-weight: bold; font-size: 13px;"
@@ -30,12 +30,14 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 								"QToolTip {"
 								"background-color: black;"
 								"font-size: 14px;"
-								"font-color: white;"
+								//"font-color: white;"
+								"color: white;"
 								"}"
 								);
 	//requestLabel->setFrameStyle(QFrame::Box|QFrame::Plain);
 	mAlternativesBox = new QComboBox(this);
 	mAlternativesBox->setEditable(false);
+	mAlternativesBox->setFixedHeight(30);
 	closeButton = new QPushButton(this);
 	connect(closeButton, &QPushButton::clicked,
 			this, &QWidget::close);
@@ -172,7 +174,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	}
 
 
-	mnComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,answerAlternatives.count()+1);
+    mnComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,(int)answerAlternatives.count()+1);
 	int ind = 0;
 	while ( (ind <nAlternatives && !answerAlternatives.isEmpty())
 		   || (ind==mnComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {
