@@ -30,13 +30,13 @@ public:
 	bool prepareTranslationRequest();
 protected:
 	void resizeEvent(QResizeEvent *) override;
+	//void closeEvent(QCloseEvent *) override;
+	void keyPressEvent(QKeyEvent *) override;
 protected slots:
 	void alternativeChoosen(int index);
 	void requestAfterWrongAlternativeChoosen();
 signals:
 	void excludeTranslation(TranslationItem *tip);
-protected:
-	//void closeEvent(QCloseEvent *) override;
 
 private:
 	QLabel *requestLabel;

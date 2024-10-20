@@ -44,6 +44,7 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	okButton = new QPushButton(this);
 	okButton->setText(tr("Ok"));
 	okButton->setMaximumWidth(40);
+	okButton->setAutoDefault(true);
 	closeButton->setText(tr("Закрыть"));
 	closeButton->setMaximumWidth(80);
 	QVBoxLayout *vlayout = new QVBoxLayout;
@@ -75,6 +76,20 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 void TranslationDialog::resizeEvent(QResizeEvent *e) {
 	requestLabel->setFixedSize(mAlternativesBox->width(), 40);
 	QWidget::resizeEvent(e);
+}
+void TranslationDialog::keyPressEvent(QKeyEvent *event) {
+	int key = event->key();
+	if (Qt::Key_Return == key) {
+		if (mAlternativesBox->isEnabled()) {
+			mAlternativesBox->setCurrentIndex(0);
+			mAlternativesBox->showPopup();
+			return;
+		}
+	}
+	else if (Qt::Key_Escape == key) {
+		close();
+	}
+	QWidget::keyPressEvent(event);
 }
 void TranslationDialog::requestAfterWrongAlternativeChoosen() {
 	if (nTriesCounter >= nTries) {
@@ -111,6 +126,7 @@ void TranslationDialog::alternativeChoosen(int index) {
 		//alternativesBox->setCurrentIndex(-1);
 		mAlternativesBox->setEnabled(false);
 		okButton->setEnabled(true);
+		okButton->setFocus();
 	}
 }
 void TranslationDialog::setSuccessesForExclusion(int num) {
@@ -196,6 +212,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	}
 	mAlternativesBox->setEnabled(true);
 	mAlternativesBox->setCurrentIndex(-1);
+	//mAlternativesBox->setFocus();
 	okButton->setEnabled(false);
 
 	return true;

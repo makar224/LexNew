@@ -153,10 +153,10 @@ void MainWindow::applicationQuit() {
 	settings.setValue("dictionaryFilePath", mDictionaryFilePath);
 
 	settings.beginGroup("Translations");
-	settings.setValue("sessionInverval", ui->sessionIntervalSpinBox->value());
-	settings.setValue("successesForExclusion", ui->successTriesSpinBox->value());
-	settings.setValue("alternativesNumber", ui->alternativesSpinBox->value());
-	settings.setValue("triesNumber", ui->triesSpinBox->value());
+	settings.setValue("sessionInverval", sessionDialog->sessionInterval());//ui->sessionIntervalSpinBox->value());
+	settings.setValue("successesForExclusion", sessionDialog->successesForExclusion());//ui->successTriesSpinBox->value());
+	settings.setValue("alternativesNumber", sessionDialog->alternativesNumber());//ui->alternativesSpinBox->value());
+	settings.setValue("triesNumber", sessionDialog->triesNumber());//ui->triesSpinBox->value());
 	settings.endGroup();
 
 	if (! saveMemoData()) {
@@ -184,6 +184,11 @@ bool MainWindow::event(QEvent *e) {
 	{
 		restoreTranslationSettings();
 		sessionStartTimer->stop();
+		restoreAction->setEnabled(false);
+		ui->startSessionButton->setFocus(); //- это кнопка autoDefault, устанавливая фокус, делаем, чтобы с нажатия Enter нажималась
+	}
+	else if (e->type() == QEvent::Hide) {
+		restoreAction->setEnabled(true);
 	}
 	else if (e->type() == QEvent::UpdateRequest) {
 		int nExcluded=0;
@@ -298,7 +303,6 @@ void MainWindow::setVisible(bool visible)
 {
 	minimizeAction->setEnabled(visible);
 	maximizeAction->setEnabled(!isMaximized());
-	bool maximized = isMaximized();
 	restoreAction->setEnabled(isMaximized() || !visible);
 	QMainWindow::setVisible(visible);
 }
@@ -315,6 +319,7 @@ void MainWindow::applyTranslationSettings() {
 	sessionDialog->setSuccessesForExclusion(ui->successTriesSpinBox->value());
 	sessionDialog->setAlternativesNumber(ui->alternativesSpinBox->value());
 	sessionDialog->setTriesNumber(ui->triesSpinBox->value());
+	ui->startSessionButton->setFocus();
 	ui->applyButton->setDisabled(true);
 	if (sessionDialog->isVisible())
 		sessionDialog->prepareTranslationRequest();
@@ -324,10 +329,12 @@ void MainWindow::restoreTranslationSettings() {
 	ui->successTriesSpinBox->setValue(sessionDialog->successesForExclusion());
 	ui->alternativesSpinBox->setValue(sessionDialog->alternativesNumber());
 	ui->triesSpinBox->setValue(sessionDialog->triesNumber());
+	ui->startSessionButton->setFocus();
 	ui->applyButton->setDisabled(true);
 }
 void MainWindow::enableApplyButton() {
 	ui->applyButton->setEnabled(true);
+	ui->applyButton->setFocus(); //- это кнопка autoDefault, устанавливая фокус, делаем, чтобы с нажатия Enter нажималась
 }
 bool MainWindow::processUnsavedChanges() {
 	if (dictEditDialog->isWindowModified()) {
@@ -440,7 +447,7 @@ bool MainWindow::saveDictionary(const QString& path) {
 	foreach(const TranslationItem* tip, trItemsL) {
 		out << tip->firstExpr() + "/" + tip->secondExpr() + "\n";
 		if (out.status() != QTextStream::Ok) {
-		qDebug() << "Ошибка записи файла" + path;
+			qDebug() << "Ошибка записи файла" + path;
 			return false;
 		}
 	}

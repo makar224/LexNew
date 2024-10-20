@@ -20,7 +20,7 @@
       <x>260</x>
       <y>280</y>
       <width>80</width>
-      <height>25</height>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">
@@ -38,6 +38,12 @@
     </property>
     <property name="text">
      <string>Запустить</string>
+    </property>
+    <property name="autoDefault">
+     <bool>true</bool>
+    </property>
+    <property name="default">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_3">
@@ -116,6 +122,9 @@
     </property>
     <property name="text">
      <string>Применить</string>
+    </property>
+    <property name="autoDefault">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -311,6 +320,17 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>sessionIntervalSpinBox</tabstop>
+  <tabstop>triesSpinBox</tabstop>
+  <tabstop>alternativesSpinBox</tabstop>
+  <tabstop>successTriesSpinBox</tabstop>
+  <tabstop>moveTranslationsButton</tabstop>
+  <tabstop>applyButton</tabstop>
+  <tabstop>startSessionButton</tabstop>
+  <tabstop>restoreDefaultsButton</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
