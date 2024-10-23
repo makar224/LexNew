@@ -17,15 +17,15 @@ public:
 		mTrItemsLPtr = tipL;
 	}
 	int sessionInterval() {return nSessionInterval;}
-	int successesForExclusion() {return nSuccessesForExclusion;}
-	int alternativesNumber() {return nAlternatives;}
-	int triesNumber() {return nTries;}
+	int successesForExclusion() {return m_nSuccessesForExclusion;}
+	int alternativesNumber() {return m_nAlternatives;}
+	int triesNumber() {return m_nTries;}
 	QComboBox* alternativesBox() const {return mAlternativesBox;}
 
 	void setSessionInterval(int num) { nSessionInterval = num;}
 	void setSuccessesForExclusion(int num);
-	void setAlternativesNumber(int num) { nAlternatives = num; }
-	void setTriesNumber(int num) { nTries = num; }
+	void setAlternativesNumber(int num) { m_nAlternatives = num; }
+	void setTriesNumber(int num) { m_nTries = num; }
 
 	bool prepareTranslationRequest();
 protected:
@@ -45,14 +45,14 @@ private:
 	QPushButton *okButton;
 	QList<TranslationItem*>* mTrItemsLPtr;
 
-	int mnComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
+	int m_nComboboxCorrectAlternativeIndex; // индекс правильного ответа в combobox
 	TranslationItem *mRequestTrItem;
 
 	int nSessionInterval;
-	int nAlternatives;
-	int nSuccessesForExclusion;
-	int nTries;
-	int nTriesCounter;
+	int m_nAlternatives;
+	int m_nSuccessesForExclusion;
+	int m_nTries;
+	int m_nTriesCounter;
 };
 
 #endif // TRANSLATIONDIALOG_H

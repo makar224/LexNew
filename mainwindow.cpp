@@ -250,7 +250,7 @@ void MainWindow::startTranslationDialog()
 	else if (qobject_cast<QPushButton*>(QObject::sender()) == ui->startSessionButton)
 	{
 		// вызов по кнопке
-		sessionDialog->setWindowModality(Qt::WindowModal);
+		//sessionDialog->setWindowModality(Qt::WindowModal);
 		if (sessionDialog->prepareTranslationRequest())
 			sessionDialog->showNormal();
 	}

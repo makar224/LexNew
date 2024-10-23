@@ -12,10 +12,10 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	mTrItemsLPtr(tilp),
 	mRequestTrItem(nullptr),
 	nSessionInterval(5),
-	nAlternatives(5),
-	nSuccessesForExclusion(3),
-	nTries(4),
-	nTriesCounter(0)
+	m_nAlternatives(5),
+	m_nSuccessesForExclusion(3),
+	m_nTries(4),
+	m_nTriesCounter(0)
 {
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
@@ -92,25 +92,25 @@ void TranslationDialog::keyPressEvent(QKeyEvent *event) {
 	QWidget::keyPressEvent(event);
 }
 void TranslationDialog::requestAfterWrongAlternativeChoosen() {
-	if (nTriesCounter >= nTries) {
-		nTriesCounter = 0;
+	if (m_nTriesCounter >= m_nTries) {
+		m_nTriesCounter = 0;
 		close();
 		return;
 	}
 	prepareTranslationRequest();
 }
 void TranslationDialog::alternativeChoosen(int index) {
-	++ nTriesCounter;
-	if (index == mnComboboxCorrectAlternativeIndex)
+	++ m_nTriesCounter;
+	if (index == m_nComboboxCorrectAlternativeIndex)
 	{ // правильный выбор перевода в combo box
 		Q_ASSERT(nullptr != mRequestTrItem);
 		mRequestTrItem->incrSuccessCounter();
-		if (mRequestTrItem->successCounter() >= nSuccessesForExclusion) {
+		if (mRequestTrItem->successCounter() >= m_nSuccessesForExclusion) {
 			emit excludeTranslation(mRequestTrItem);
 		}
-		if (nTriesCounter >= nTries)
+		if (m_nTriesCounter >= m_nTries)
 		{
-			nTriesCounter = 0;
+			m_nTriesCounter = 0;
 			close();
 			return;
 		}
@@ -122,7 +122,7 @@ void TranslationDialog::alternativeChoosen(int index) {
 	}
 	else {
 		mRequestTrItem->resetSuccessCounter();
-		mAlternativesBox->setCurrentIndex(mnComboboxCorrectAlternativeIndex);
+		mAlternativesBox->setCurrentIndex(m_nComboboxCorrectAlternativeIndex);
 		//alternativesBox->setCurrentIndex(-1);
 		mAlternativesBox->setEnabled(false);
 		okButton->setEnabled(true);
@@ -135,7 +135,7 @@ void TranslationDialog::setSuccessesForExclusion(int num) {
 	//	if (tip->successCounter() >= num)
 	//		emit excludeTranslation(tip);
 	//} // закомментировано - здесь - не исключаются - будут исключаться сразу после попадания в запрос перевода
-	nSuccessesForExclusion = num;
+	m_nSuccessesForExclusion = num;
 }
 // Подготавливаем диалог к выдаче запроса перевода
 bool TranslationDialog::prepareTranslationRequest()
@@ -190,11 +190,11 @@ bool TranslationDialog::prepareTranslationRequest()
 	}
 
 
-    mnComboboxCorrectAlternativeIndex = rand() % std::min(nAlternatives,(int)answerAlternatives.count()+1);
+	m_nComboboxCorrectAlternativeIndex = rand() % std::min(m_nAlternatives,(int)answerAlternatives.count()+1);
 	int ind = 0;
-	while ( (ind <nAlternatives && !answerAlternatives.isEmpty())
-		   || (ind==mnComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {
-		if (ind == mnComboboxCorrectAlternativeIndex) {
+	while ( (ind <m_nAlternatives && !answerAlternatives.isEmpty())
+		   || (ind==m_nComboboxCorrectAlternativeIndex && answerAlternatives.isEmpty()) ) {
+		if (ind == m_nComboboxCorrectAlternativeIndex) {
 			altText = correctAnswer;
 		}
 		else {
