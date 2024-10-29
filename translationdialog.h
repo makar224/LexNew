@@ -7,6 +7,12 @@
 #include <QPushButton>
 #include "translationmodel.h"
 
+enum TrDirection {
+	Forward,
+	Backward,
+	Mixed
+};
+
 class TranslationDialog : public QWidget
 {
 	Q_OBJECT
@@ -16,16 +22,19 @@ public:
 	void setTranslations(QList<TranslationItem*>* tipL) {
 		mTrItemsLPtr = tipL;
 	}
-	int sessionInterval() {return nSessionInterval;}
-	int successesForExclusion() {return m_nSuccessesForExclusion;}
-	int alternativesNumber() {return m_nAlternatives;}
-	int triesNumber() {return m_nTries;}
+	int sessionInterval() const {return nSessionInterval;}
+	int successesForExclusion() const {return m_nSuccessesForExclusion;}
+	int alternativesNumber() const {return m_nAlternatives;}
+	int triesNumber() const {return m_nTries;}
+	TrDirection trDirection() const {return m_nTrDirection;}
+
 	QComboBox* alternativesBox() const {return mAlternativesBox;}
 
 	void setSessionInterval(int num) { nSessionInterval = num;}
 	void setSuccessesForExclusion(int num);
 	void setAlternativesNumber(int num) { m_nAlternatives = num; }
 	void setTriesNumber(int num) { m_nTries = num; }
+	void setTrDirection(TrDirection dir) { m_nTrDirection = dir; }
 
 	bool prepareTranslationRequest();
 protected:
@@ -53,6 +62,7 @@ private:
 	int m_nSuccessesForExclusion;
 	int m_nTries;
 	int m_nTriesCounter;
+	TrDirection m_nTrDirection;
 };
 
 #endif // TRANSLATIONDIALOG_H

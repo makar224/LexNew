@@ -25,10 +25,8 @@ public:
 	void setVisible(bool visible) override;
 
 protected slots:
-	void applyTranslationSettings();
 	void restoreDefaultTranslationSettings();
-	void enableApplyButton();
-
+	void applyTranslationSettings();
 	void addTranslation(const TranslationItem *tip);
 	void removeTranslation(const TranslationItem *tip);
 	void editTranslation(const TranslationItem *tip);
@@ -48,8 +46,11 @@ private slots:
 	void openFile();
 	bool saveFile();
 	bool saveFileAs();
+	void enableApplyButton();
 private:
 	void restoreTranslationSettings();
+	TrDirection uiTrDirection() const;
+	bool translationSettingsDiffer() const;
 	void createActions();
 	void createTrayIcon();
 	bool processUnsavedChanges();
@@ -61,6 +62,7 @@ private:
 	bool removeMemoDataFile();
 	void setDictFilePath(const QString& path);
 	void clearTrItems();
+
     Ui::MainWindow *ui;
 	MoveTranslationsDialog *moveTranslationsDialog;
 	DictionaryEditDialog *dictEditDialog;
