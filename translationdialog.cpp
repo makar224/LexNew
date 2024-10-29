@@ -15,7 +15,8 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	m_nAlternatives(5),
 	m_nSuccessesForExclusion(3),
 	m_nTries(4),
-	m_nTriesCounter(0)
+	m_nTriesCounter(0),
+	m_nTrDirection(Mixed)
 {
 	srand(time(NULL)%RAND_MAX); // устанавливаем "отправную точку" генерирования последовательности случайных чисел
 
@@ -45,8 +46,10 @@ TranslationDialog::TranslationDialog(QWidget *parent, QList<TranslationItem*>* t
 	okButton->setText(tr("Ok"));
 	okButton->setMaximumWidth(40);
 	okButton->setAutoDefault(true);
+	//okButton->setDefault(true); // default button - только для dialog, а это widget
 	closeButton->setText(tr("Закрыть"));
 	closeButton->setMaximumWidth(80);
+	closeButton->setAutoDefault(true);
 	QVBoxLayout *vlayout = new QVBoxLayout;
 	vlayout->setSpacing(0);
 	vlayout->addWidget(requestLabel);
@@ -165,10 +168,23 @@ bool TranslationDialog::prepareTranslationRequest()
 	mRequestTrItem = workTrItemsv[index];
 
 	workTrItemsv.remove(index); // удаляем, чтобы он больше не выбирался во время выбора альтернатив
-	bool trdir = (bool)(rand() % 2); // задаем направление переводов
 
-	QString correctAnswer = trdir?mRequestTrItem->firstExpr():mRequestTrItem->secondExpr();
-	QString requestText = trdir?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr();
+	// задаем направление перевода
+	bool tr_dir = true;
+	switch(m_nTrDirection) {
+	case Forward:
+		tr_dir = true;
+		break;
+	case Backward:
+		tr_dir = false;
+		break;
+	case Mixed:
+	default:
+		tr_dir = (bool)(rand() % 2);
+	}
+
+	QString correctAnswer = tr_dir?mRequestTrItem->secondExpr():mRequestTrItem->firstExpr();
+	QString requestText = tr_dir?mRequestTrItem->firstExpr():mRequestTrItem->secondExpr();
 	requestLabel->setText(requestText);
 	requestLabel->setToolTip(requestText);
 
@@ -179,7 +195,7 @@ bool TranslationDialog::prepareTranslationRequest()
 	// формируем список возможных ответов без правильного ответа
 	QStringList answerAlternatives;
 	for (const TranslationItem *tip: workTrItemsv) {
-		altText = trdir?tip->firstExpr():tip->secondExpr();
+		altText = tr_dir?tip->secondExpr():tip->firstExpr();
 		if (altText != correctAnswer)
 			answerAlternatives << altText;
 	}

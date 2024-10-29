@@ -26,15 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->setupUi(this);
 
-	connect(ui->sessionIntervalSpinBox, SIGNAL(textChanged(const QString&)),
-			this, SLOT(enableApplyButton()));
-	connect(ui->triesSpinBox, SIGNAL(textChanged(const QString&)),
-			this, SLOT(enableApplyButton()));
-	connect(ui->alternativesSpinBox, SIGNAL(textChanged(const QString&)),
-			this, SLOT(enableApplyButton()));
-	connect(ui->successTriesSpinBox, SIGNAL(textChanged(const QString&)),
-			this, SLOT(enableApplyButton()));
-
 	moveTranslationsDialog = new MoveTranslationsDialog;
 	connect(ui->moveTranslationsButton, &QPushButton::clicked,
 			moveTranslationsDialog, &QDialog::open);
@@ -76,13 +67,13 @@ MainWindow::MainWindow(QWidget *parent)
 	// Загружаем позицию окна из settings
 	QSettings settings;
 	settings.beginGroup("MainWindow");
-	const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
-	if (geometry.isEmpty()) {
-		QRect screenRect = QGuiApplication::primaryScreen()->geometry();
-		setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
-	}
-	else
-		restoreGeometry(geometry);
+	//const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
+	//if (geometry.isEmpty()) {
+	QRect screenRect = QGuiApplication::primaryScreen()->geometry();
+	setGeometry( (screenRect.width()-width())/2, (screenRect.height()-height())/2, width(), height());
+	//}
+	//else
+	//	restoreGeometry(geometry);
 	settings.endGroup();
 	setFixedSize(width(), height());
 
@@ -116,13 +107,28 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 	}
 
+	connect(ui->sessionIntervalSpinBox, SIGNAL(textChanged(QString)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->triesSpinBox, SIGNAL(textChanged(QString)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->alternativesSpinBox, SIGNAL(textChanged(QString)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->successTriesSpinBox, SIGNAL(textChanged(QString)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->forwardRadioButton, SIGNAL(clicked(bool)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->backwardRadioButton, SIGNAL(clicked(bool)),
+			this, SLOT(enableApplyButton()));
+	connect(ui->mixedRadioButton, SIGNAL(clicked(bool)),
+			this, SLOT(enableApplyButton()));
 	connect(ui->applyButton, &QPushButton::clicked,
 			this, &MainWindow::applyTranslationSettings);
 	connect(ui->restoreDefaultsButton, &QPushButton::clicked,
 			this, &MainWindow::restoreDefaultTranslationSettings);
-
 	connect(ui->startSessionButton, &QPushButton::clicked,
 				this, &MainWindow::startTranslationDialog);
+	ui->startSessionButton->setFocus();
+
 	sessionStartTimer = new QTimer();
 	//connect(sessionStartTimer, &QTimer::timeout,
 	//			sessionDialog, &QWidget::showNormal);
@@ -311,14 +317,18 @@ void MainWindow::restoreDefaultTranslationSettings() {
 	ui->successTriesSpinBox->setValue(3);
 	ui->alternativesSpinBox->setValue(5);
 	ui->triesSpinBox->setValue(4);
+	ui->mixedRadioButton->setChecked(true);
 
 	//applyTranslationSettings();
+	enableApplyButton();
 }
 void MainWindow::applyTranslationSettings() {
 	sessionDialog->setSessionInterval(ui->sessionIntervalSpinBox->value());
 	sessionDialog->setSuccessesForExclusion(ui->successTriesSpinBox->value());
 	sessionDialog->setAlternativesNumber(ui->alternativesSpinBox->value());
 	sessionDialog->setTriesNumber(ui->triesSpinBox->value());
+	sessionDialog->setTrDirection(uiTrDirection());
+
 	ui->startSessionButton->setFocus();
 	ui->applyButton->setDisabled(true);
 	if (sessionDialog->isVisible())
@@ -329,12 +339,42 @@ void MainWindow::restoreTranslationSettings() {
 	ui->successTriesSpinBox->setValue(sessionDialog->successesForExclusion());
 	ui->alternativesSpinBox->setValue(sessionDialog->alternativesNumber());
 	ui->triesSpinBox->setValue(sessionDialog->triesNumber());
-	ui->startSessionButton->setFocus();
-	ui->applyButton->setDisabled(true);
+	switch(sessionDialog->trDirection()) {
+	case Forward:
+		ui->forwardRadioButton->setChecked(true);
+		break;
+	case Backward:
+		ui->backwardRadioButton->setChecked(true);
+		break;
+	case Mixed:
+	default:
+		ui->mixedRadioButton->setChecked(true);
+	}
+
+	//ui->startSessionButton->setFocus();
+	ui->applyButton->setEnabled(false);
 }
 void MainWindow::enableApplyButton() {
-	ui->applyButton->setEnabled(true);
-	ui->applyButton->setFocus(); //- это кнопка autoDefault, устанавливая фокус, делаем, чтобы с нажатия Enter нажималась
+	if (! translationSettingsDiffer())
+		ui->applyButton->setEnabled(false);
+	else
+		ui->applyButton->setEnabled(true);
+	//ui->applyButton->setFocus(); //- это кнопка autoDefault, устанавливая фокус, делаем, чтобы с нажатия Enter нажималась
+}
+bool MainWindow::translationSettingsDiffer() const {
+	return ui->sessionIntervalSpinBox->value() != sessionDialog->sessionInterval()
+		   || ui->successTriesSpinBox->value() != sessionDialog->successesForExclusion()
+		   || ui->alternativesSpinBox->value() != sessionDialog->alternativesNumber()
+		   || ui->triesSpinBox->value() != sessionDialog->triesNumber()
+		   || uiTrDirection() != sessionDialog->trDirection();
+}
+TrDirection MainWindow::uiTrDirection() const {
+	if (ui->forwardRadioButton->isChecked())
+		return Forward;
+	else if(ui->backwardRadioButton->isChecked())
+		return Backward;
+	else
+		return Mixed;
 }
 bool MainWindow::processUnsavedChanges() {
 	if (dictEditDialog->isWindowModified()) {
